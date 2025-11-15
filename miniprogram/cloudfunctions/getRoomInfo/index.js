@@ -1,0 +1,52 @@
+// 云函数：获取房间信息
+const cloud = require('wx-server-sdk')
+
+cloud.init({
+  env: cloud.DYNAMIC_CURRENT_ENV
+})
+
+const db = cloud.database()
+
+exports.main = async (event, context) => {
+  const { room_id } = event
+
+  try {
+    // 获取房间信息
+    const roomResult = await db.collection('rooms').doc(room_id).get()
+
+    if (!roomResult.data) {
+      return {
+        error: '房间不存在'
+      }
+    }
+
+    const room = roomResult.data
+
+    // 获取房间内的玩家
+    const playersResult = await db.collection('players')
+      .where({
+        room_id: room_id
+      })
+      .orderBy('player_number', 'asc')
+      .get()
+
+    const players = playersResult.data.map(p => ({
+      player_number: p.player_number,
+      nickname: p.nickname || `玩家${p.player_number}`,
+      letter: p.letter || ''
+    }))
+
+    return {
+      room_id: room._id,
+      max_players: room.max_players,
+      status: room.status,
+      current_players: players.length,
+      players: players
+    }
+  } catch (error) {
+    return {
+      error: '获取房间信息失败',
+      details: error.message
+    }
+  }
+}

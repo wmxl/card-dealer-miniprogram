@@ -1,0 +1,26 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">桌游发牌助手</text>
+    <text class="subtitle">和朋友一起玩桌游</text>
+  </view>
+
+  <view class="content">
+    <button class="btn btn-primary" bindtap="createRoom">创建房间</button>
+
+    <view class="divider">
+      <text>或</text>
+    </view>
+
+    <view class="input-group">
+      <input
+        class="input"
+        placeholder="输入房间号"
+        value="{{roomId}}"
+        bindinput="inputRoomId"
+        maxlength="6"
+      />
+      <button class="btn btn-secondary" bindtap="joinRoom">加入房间</button>
+    </view>
+  </view>
+</view>

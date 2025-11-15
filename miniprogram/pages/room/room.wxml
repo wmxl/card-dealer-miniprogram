@@ -1,0 +1,76 @@
+<!--pages/room/room.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="room-info">
+      <text class="room-id">房间号：{{roomId}}</text>
+      <text class="player-count">{{currentPlayers}}/{{maxPlayers}}人</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <!-- 未加入时显示加入按钮 -->
+    <view wx:if="{{myPlayerNumber === 0}}" class="join-section">
+      <button class="btn btn-primary" bindtap="joinRoom" loading="{{loading}}">
+        加入房间
+      </button>
+    </view>
+
+    <!-- 已加入但未发牌 -->
+    <view wx:elif="{{!gameStarted}}" class="waiting-section">
+      <view class="my-info">
+        <text class="label">你的编号：</text>
+        <text class="value">{{myPlayerNumber}}</text>
+      </view>
+
+      <view class="players-list">
+        <view class="player-item" wx:for="{{players}}" wx:key="player_number">
+          <text class="player-number">{{item.player_number}}号</text>
+          <text class="player-name">{{item.nickname || '玩家' + item.player_number}}</text>
+        </view>
+      </view>
+
+      <view class="actions">
+        <button
+          wx:if="{{isCreator}}"
+          class="btn btn-primary"
+          bindtap="dealCards"
+          loading="{{loading}}"
+          disabled="{{currentPlayers < 5}}"
+        >
+          发牌（需{{currentPlayers < 5 ? 5 - currentPlayers + '人' : ''}}）
+        </button>
+        <text wx:else class="waiting-text">等待房主发牌...</text>
+      </view>
+    </view>
+
+    <!-- 已发牌 -->
+    <view wx:else class="result-section">
+      <view class="my-letter-card">
+        <text class="label">你的字母</text>
+        <text class="letter">{{myLetter}}</text>
+      </view>
+
+      <view class="players-result">
+        <view class="result-title">所有玩家分配结果</view>
+        <view class="player-result-item" wx:for="{{players}}" wx:key="player_number">
+          <text class="result-number">{{item.player_number}}号</text>
+          <text class="result-name">{{item.nickname || '玩家' + item.player_number}}</text>
+          <text class="result-letter">{{item.letter}}</text>
+        </view>
+      </view>
+
+      <view class="actions">
+        <button
+          wx:if="{{isCreator}}"
+          class="btn btn-secondary"
+          bindtap="resetRoom"
+        >
+          重置房间
+        </button>
+        <button class="btn btn-share" open-type="share">
+          分享房间
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
