@@ -67,11 +67,15 @@ Page({
         const data = res.result
         const gameStarted = data.status !== 'waiting'
 
+        // 检查当前玩家是否是房主（1号玩家）
+        const isCreator = this.data.myPlayerNumber === 1
+
         this.setData({
           maxPlayers: data.max_players,
           currentPlayers: data.current_players,
           players: data.players,
-          gameStarted: gameStarted
+          gameStarted: gameStarted,
+          isCreator: isCreator || this.data.isCreator // 保留原有的isCreator，或者根据玩家编号判断
         })
 
         // 如果游戏已开始，自动跳转到角色查看页面

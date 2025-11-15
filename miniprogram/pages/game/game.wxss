@@ -10,9 +10,33 @@
 .rules-btn {
   position: absolute;
   top: 30rpx;
-  right: 30rpx;
+  right: 250rpx;
   padding: 20rpx 30rpx;
   background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.role-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 140rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.reset-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 107, 107, 0.3);
   border-radius: 40rpx;
   color: white;
   font-size: 28rpx;
@@ -50,7 +74,7 @@
 }
 
 .content {
-  padding-top: 20rpx;
+  padding-top: 120rpx; /* 增加顶部间距，避免被房间号和规则按钮覆盖 */
 }
 
 /* 游戏进度 */
@@ -75,10 +99,21 @@
   border-radius: 12rpx;
   margin: 0 5rpx;
   position: relative;
+  transition: all 0.3s;
 }
 
 .mission-item.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.mission-item.mission-success {
+  background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+  color: white;
+}
+
+.mission-item.mission-failed {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
   color: white;
 }
 
@@ -92,7 +127,7 @@
   opacity: 0.8;
 }
 
-.mission-result {
+.mission-result-badge {
   position: absolute;
   top: -10rpx;
   right: -10rpx;
@@ -105,7 +140,17 @@
   justify-content: center;
   font-size: 24rpx;
   font-weight: bold;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.mission-success .mission-result-badge {
+  background: #4caf50;
+  color: white;
+}
+
+.mission-failed .mission-result-badge {
+  background: #f44336;
+  color: white;
 }
 
 .score-display {
@@ -214,13 +259,16 @@
   padding: 30rpx 20rpx;
   text-align: center;
   border: 3rpx solid transparent;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .player-card.selected {
-  background: #e8f5e9;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
   border-color: #4caf50;
-  position: relative;
+  border-width: 4rpx;
+  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.4);
+  transform: scale(1.05);
 }
 
 .player-card.selected::after {
@@ -238,6 +286,7 @@
   justify-content: center;
   font-size: 24rpx;
   font-weight: bold;
+  box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.6);
 }
 
 .player-card-number {
@@ -370,6 +419,13 @@
   background: #4caf50;
   color: white;
   font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-approve.vote-selected {
+  background: #2e7d32;
+  box-shadow: 0 0 0 4rpx rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
 }
 
 .btn-reject {
@@ -377,4 +433,138 @@
   background: #f44336;
   color: white;
   font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-reject.vote-selected {
+  background: #c62828;
+  box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.5);
+  transform: scale(1.05);
+}
+
+/* 身份弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-modal {
+  width: 600rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.role-modal-header {
+  padding: 40rpx 30rpx;
+  text-align: center;
+}
+
+.role-modal-header.good {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+}
+
+.role-modal-header.evil {
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+}
+
+.role-modal-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10rpx;
+}
+
+.role-modal-side {
+  display: block;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.role-modal-content {
+  padding: 30rpx;
+}
+
+.role-modal-message {
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+.role-modal-players {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+}
+
+.role-modal-subtitle {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 15rpx;
+}
+
+.role-modal-player {
+  padding: 15rpx;
+  background: white;
+  border-radius: 8rpx;
+  margin-bottom: 10rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.role-modal-player:last-child {
+  margin-bottom: 0;
+}
+
+.player-num {
+  color: #667eea;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.player-nickname {
+  margin-right: 10rpx;
+}
+
+.player-role {
+  color: #999;
+}
+
+.role-modal-tip {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #fff3cd;
+  border-left: 4rpx solid #ffc107;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #856404;
+  line-height: 1.5;
+}
+
+.role-modal-footer {
+  padding: 20rpx 30rpx 30rpx;
+}
+
+.btn-close {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
 }

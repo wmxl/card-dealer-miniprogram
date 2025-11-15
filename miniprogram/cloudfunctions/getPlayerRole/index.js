@@ -22,8 +22,10 @@ function getPlayerVision(player, allPlayers) {
       vision.seePlayers = allPlayers
         .filter(p => p.role.side === 'evil' && p.role.code !== 'mordred')
         .map(p => ({
+          number: p.player_number,
           playerNumber: p.player_number,
-          nickname: p.nickname || `玩家${p.player_number}`
+          nickname: p.nickname || `玩家${p.player_number}`,
+          roleName: '坏人'
         }))
       vision.message = '你看到了以下坏人（不包括莫德雷德）'
       vision.tip = '保护好自己的身份，不要被刺客发现'
@@ -34,8 +36,10 @@ function getPlayerVision(player, allPlayers) {
       vision.seePlayers = allPlayers
         .filter(p => p.role.code === 'merlin' || p.role.code === 'morgana')
         .map(p => ({
+          number: p.player_number,
           playerNumber: p.player_number,
-          nickname: p.nickname || `玩家${p.player_number}`
+          nickname: p.nickname || `玩家${p.player_number}`,
+          roleName: '梅林/莫甘娜'
         }))
       vision.message = '以下两人中，一人是梅林，一人是莫甘娜'
       vision.tip = '找出真正的梅林并保护他'
@@ -49,9 +53,10 @@ function getPlayerVision(player, allPlayers) {
       vision.seePlayers = allPlayers
         .filter(p => p.role.side === 'evil' && p.role.code !== 'oberon' && p.player_number !== player.player_number)
         .map(p => ({
+          number: p.player_number,
           playerNumber: p.player_number,
           nickname: p.nickname || `玩家${p.player_number}`,
-          role: p.role.name
+          roleName: p.role.name
         }))
       vision.message = '你的队友'
       vision.tip = player.role.code === 'assassin'

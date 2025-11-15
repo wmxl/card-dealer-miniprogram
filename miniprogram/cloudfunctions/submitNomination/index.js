@@ -42,11 +42,13 @@ exports.main = async (event, context) => {
     }
 
     // 更新房间状态为投票阶段
+    console.log('提名成功，清空投票记录，进入投票阶段')
     await db.collection('rooms').doc(room_id).update({
       data: {
         status: 'voting',
         'game_state.nominated_players': nominated_players,
-        'game_state.votes': {},
+        'game_state.votes': {}, // 清空投票记录
+        'game_state.vote_count': 0,
         updated_at: db.serverDate()
       }
     })

@@ -56,6 +56,11 @@ Page({
           tip: res.result.tip,
           loading: false
         })
+
+        // 自动确认并进入游戏（延迟2秒，让玩家能看到身份）
+        setTimeout(() => {
+          this.autoEnterGame()
+        }, 2000)
       } else {
         wx.showToast({
           title: res.result?.error || '加载失败',
@@ -96,6 +101,13 @@ Page({
           })
         }
       }
+    })
+  },
+
+  // 自动进入游戏（不弹出确认对话框）
+  autoEnterGame() {
+    wx.redirectTo({
+      url: `/pages/game/game?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
     })
   },
 

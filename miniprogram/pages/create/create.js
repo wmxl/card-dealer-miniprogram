@@ -1,7 +1,7 @@
 // pages/create/create.js
 Page({
   data: {
-    maxPlayers: 5,
+    maxPlayers: 3,
     loading: false,
     showRulesModal: false
   },

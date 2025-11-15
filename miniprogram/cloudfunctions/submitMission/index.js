@@ -156,6 +156,10 @@ async function processMissionResult(room_id, room, missionSubmissions) {
         'game_state.mission_results': missionResults,
         'game_state.good_wins': goodWins,
         'game_state.evil_wins': evilWins,
+        'game_state.votes': {}, // 清空投票记录
+        'game_state.mission_submissions': {}, // 清空任务提交记录
+        'game_state.nominated_players': [], // 清空提名玩家
+        'game_state.vote_count': 0,
         updated_at: db.serverDate()
       }
     })

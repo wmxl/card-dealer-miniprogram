@@ -8,6 +8,63 @@ cloud.init({
 const db = cloud.database()
 const _ = db.command
 
+// 导入游戏规则配置
+const { getRolesForPlayerCount, getMissionConfig } = require('./avalon-config')
+
+// 自动发牌函数
+async function autoDealCards(room_id) {
+  const playersResult = await db.collection('players')
+    .where({ room_id: room_id })
+    .orderBy('player_number', 'asc')
+    .get()
+
+  const players = playersResult.data
+  const playerCount = players.length
+
+  // 获取角色配置
+  const rolesConfig = getRolesForPlayerCount(playerCount)
+
+  // 合并好人和坏人角色数组
+  const allRoles = [...rolesConfig.good, ...rolesConfig.evil]
+
+  // 随机分配角色
+  const shuffledRoles = allRoles.sort(() => Math.random() - 0.5)
+
+  // 更新玩家角色
+  const updatePromises = players.map((player, index) => {
+    return db.collection('players').doc(player._id).update({
+      data: {
+        role: shuffledRoles[index],
+        updated_at: db.serverDate()
+      }
+    })
+  })
+
+  await Promise.all(updatePromises)
+
+  // 获取任务配置
+  const missionConfig = getMissionConfig(playerCount)
+
+  // 更新房间状态
+  await db.collection('rooms').doc(room_id).update({
+    data: {
+      status: 'role_reveal',
+      game_state: {
+        current_mission: 0,
+        current_round: 0,
+        current_leader: 0,
+        mission_results: [],
+        vote_history: [],
+        consecutive_rejects: 0,
+        good_wins: 0,
+        evil_wins: 0
+      },
+      mission_config: missionConfig,
+      updated_at: db.serverDate()
+    }
+  })
+}
+
 exports.main = async (event, context) => {
   const { room_id, nickname } = event
 
@@ -66,11 +123,24 @@ exports.main = async (event, context) => {
       }
     })
 
+    const newPlayerCount = current_count + 1
+
+    // 检查是否人数已满，自动开始游戏
+    if (newPlayerCount === room.max_players) {
+      // 自动发牌
+      try {
+        await autoDealCards(room_id)
+      } catch (error) {
+        console.error('自动发牌失败:', error)
+      }
+    }
+
     return {
       player_number: player_number,
-      current_players: current_count + 1,
+      current_players: newPlayerCount,
       max_players: room.max_players,
-      message: '加入房间成功'
+      auto_started: newPlayerCount === room.max_players,
+      message: newPlayerCount === room.max_players ? '房间已满，自动开始游戏' : '加入房间成功'
     }
   } catch (error) {
     return {

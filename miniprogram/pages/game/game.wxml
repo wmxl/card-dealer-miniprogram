@@ -5,6 +5,16 @@
     <text>📖 规则</text>
   </view>
 
+  <!-- 身份按钮 -->
+  <view class="role-btn" bindtap="showRole">
+    <text>🎭 身份</text>
+  </view>
+
+  <!-- 重置按钮 -->
+  <view class="reset-btn" bindtap="resetGame">
+    <text>🔄 重开</text>
+  </view>
+
   <!-- 房间号 -->
   <view class="room-header">
     <text class="room-id-label">房间号：</text>
@@ -20,13 +30,13 @@
     <view class="game-progress">
       <view class="mission-track">
         <view
-          class="mission-item {{index <= currentMission ? 'active' : ''}} {{item.result}}"
+          class="mission-item {{missionResults[index] ? (missionResults[index].success ? 'mission-success' : 'mission-failed') : (index <= currentMission ? 'active' : '')}}"
           wx:for="{{missionConfig}}"
           wx:key="*this"
         >
           <view class="mission-number">任务{{index + 1}}</view>
           <view class="mission-players">{{item.players}}人</view>
-          <view wx:if="{{missionResults[index]}}" class="mission-result">
+          <view wx:if="{{missionResults[index]}}" class="mission-result-badge">
             {{missionResults[index].success ? '✓' : '✗'}}
           </view>
         </view>
@@ -66,9 +76,10 @@
       <view wx:if="{{isLeader}}" class="leader-actions">
         <view class="players-grid">
           <view
-            class="player-card {{selectedPlayers.indexOf(item.player_number) > -1 ? 'selected' : ''}}"
+            class="player-card {{selectedPlayersMap[item.player_number] ? 'selected' : ''}}"
             wx:for="{{allPlayers}}"
-            wx:key="player_number"
+            wx:for-item="item"
+            wx:key="*this"
             data-player="{{item.player_number}}"
             bindtap="togglePlayerSelection"
           >
@@ -115,14 +126,14 @@
 
       <view class="vote-buttons">
         <button
-          class="btn btn-approve"
+          class="btn btn-approve {{myVoteChoice === true ? 'vote-selected' : ''}}"
           data-approve="true"
           bindtap="vote"
         >
           赞成 👍
         </button>
         <button
-          class="btn btn-reject"
+          class="btn btn-reject {{myVoteChoice === false ? 'vote-selected' : ''}}"
           data-approve="false"
           bindtap="vote"
         >
@@ -147,4 +158,31 @@
 
   <!-- 规则弹窗 -->
   <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
+
+  <!-- 身份弹窗 -->
+  <view wx:if="{{showRoleModal}}" class="modal-overlay" bindtap="hideRole">
+    <view class="role-modal" catchtap="stopPropagation">
+      <view class="role-modal-header {{role.side}}">
+        <text class="role-modal-title">{{role.name}}</text>
+        <text class="role-modal-side">{{role.side === 'good' ? '好人阵营' : '坏人阵营'}}</text>
+      </view>
+      <view class="role-modal-content">
+        <view class="role-modal-message">{{role.message}}</view>
+        <view wx:if="{{role.seePlayers && role.seePlayers.length > 0}}" class="role-modal-players">
+          <view class="role-modal-subtitle">你知道的信息：</view>
+          <view wx:for="{{role.seePlayers}}" wx:key="*this" class="role-modal-player">
+            <text class="player-num">{{item.number}}号</text>
+            <text class="player-nickname">{{item.nickname}}</text>
+            <text class="player-role">- {{item.roleName}}</text>
+          </view>
+        </view>
+        <view wx:if="{{role.tip}}" class="role-modal-tip">
+          💡 {{role.tip}}
+        </view>
+      </view>
+      <view class="role-modal-footer">
+        <button class="btn-close" bindtap="hideRole">关闭</button>
+      </view>
+    </view>
+  </view>
 </view>

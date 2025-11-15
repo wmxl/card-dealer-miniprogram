@@ -88,7 +88,8 @@ exports.main = async (event, context) => {
           vote_history: [],    // 投票历史
           consecutive_rejects: 0, // 连续否决次数
           good_wins: 0,        // 好人胜利次数
-          evil_wins: 0         // 坏人胜利次数
+          evil_wins: 0,         // 坏人胜利次数
+          vote_count: 0
         },
         mission_config: missionConfig,
         updated_at: db.serverDate()
