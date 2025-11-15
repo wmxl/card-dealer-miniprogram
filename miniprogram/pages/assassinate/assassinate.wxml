@@ -1,0 +1,71 @@
+<!--pages/assassinate/assassinate.wxml-->
+<view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{!isAssassin}}" class="waiting-section">
+    <view class="waiting-icon">🗡️</view>
+    <view class="waiting-text">刺杀阶段</view>
+    <view class="waiting-desc">等待刺客选择目标...</view>
+    <view class="waiting-tip">如果刺客成功刺杀梅林，坏人获胜</view>
+  </view>
+
+  <view wx:else class="assassinate-section">
+    <view class="assassinate-header">
+      <view class="header-icon">🗡️</view>
+      <text class="header-title">刺杀阶段</text>
+      <text class="header-subtitle">找出梅林并刺杀他</text>
+    </view>
+
+    <view class="tip-card">
+      <view class="tip-title">💡 提示</view>
+      <view class="tip-content">
+        好人已经完成三次任务，你有一次机会刺杀梅林。
+        如果刺杀成功，坏人获胜；否则好人获胜。
+      </view>
+    </view>
+
+    <view class="players-section">
+      <view class="section-title">选择要刺杀的玩家</view>
+
+      <view class="players-grid">
+        <view
+          class="player-card {{selectedPlayer === item.player_number ? 'selected' : ''}}"
+          wx:for="{{allPlayers}}"
+          wx:key="player_number"
+          data-player="{{item.player_number}}"
+          bindtap="selectPlayer"
+        >
+          <text class="player-number">{{item.player_number}}</text>
+          <text class="player-name">{{item.nickname || '玩家' + item.player_number}}</text>
+          <view wx:if="{{selectedPlayer === item.player_number}}" class="selected-badge">
+            ✓
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button
+        class="btn btn-assassinate"
+        bindtap="confirmAssassinate"
+        disabled="{{!selectedPlayer}}"
+      >
+        确认刺杀
+      </button>
+    </view>
+
+    <view class="warning">
+      ⚠️ 选择后无法修改，请慎重决定！
+    </view>
+  </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
+</view>

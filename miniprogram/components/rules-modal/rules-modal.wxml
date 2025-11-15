@@ -1,0 +1,44 @@
+<!--components/rules-modal/rules-modal.wxml-->
+<view class="rules-modal" wx:if="{{show}}" catchtouchmove="preventScroll">
+  <view class="modal-mask" bindtap="close"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">{{rules.title}}</text>
+      <view class="close-btn" bindtap="close">✕</view>
+    </view>
+
+    <scroll-view class="modal-body" scroll-y>
+      <view class="section" wx:for="{{rules.sections}}" wx:key="title">
+        <view class="section-title">{{item.title}}</view>
+
+        <!-- 普通内容 -->
+        <view wx:if="{{item.content}}" class="section-content">
+          <view wx:for="{{item.content}}" wx:key="*this" wx:for-item="line" class="content-line">
+            {{line}}
+          </view>
+        </view>
+
+        <!-- 表格 -->
+        <view wx:if="{{item.table}}" class="table-container">
+          <view class="table">
+            <view class="table-row table-header">
+              <text class="table-cell" wx:for="{{item.table.headers}}" wx:key="*this">
+                {{item}}
+              </text>
+            </view>
+            <view class="table-row" wx:for="{{item.table.rows}}" wx:key="*this" wx:for-item="row">
+              <text class="table-cell" wx:for="{{row}}" wx:key="*this">
+                {{item}}
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 注释 -->
+        <view wx:if="{{item.note}}" class="section-note">
+          {{item.note}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

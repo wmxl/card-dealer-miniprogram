@@ -1,0 +1,64 @@
+<!--pages/role-reveal/role-reveal.wxml-->
+<view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <!-- 玩家信息 -->
+    <view class="player-info">
+      <text class="player-label">玩家编号</text>
+      <text class="player-number">{{playerNumber}}</text>
+      <text class="player-name">{{nickname || '玩家' + playerNumber}}</text>
+    </view>
+
+    <!-- 角色卡片 -->
+    <view class="role-card {{role.side}}">
+      <view class="role-header">
+        <text class="role-name">{{role.name}}</text>
+        <text class="role-side">{{role.side === 'good' ? '好人阵营' : '坏人阵营'}}</text>
+      </view>
+
+      <view class="role-message">
+        <text>{{message}}</text>
+      </view>
+
+      <!-- 可见玩家列表 -->
+      <view wx:if="{{seePlayers.length > 0}}" class="see-players">
+        <view class="see-player-item" wx:for="{{seePlayers}}" wx:key="playerNumber">
+          <text class="see-player-number">{{item.playerNumber}}号</text>
+          <text class="see-player-name">{{item.nickname || '玩家' + item.playerNumber}}</text>
+          <text wx:if="{{item.role}}" class="see-player-role">（{{item.role}}）</text>
+        </view>
+      </view>
+
+      <view wx:if="{{tip}}" class="role-tip">
+        💡 {{tip}}
+      </view>
+    </view>
+
+    <!-- 确认按钮 -->
+    <view class="actions">
+      <button
+        class="btn btn-confirm"
+        bindtap="confirmRole"
+        disabled="{{confirmed}}"
+      >
+        {{confirmed ? '已确认' : '确认身份，开始游戏'}}
+      </button>
+    </view>
+
+    <!-- 提示 -->
+    <view class="warning">
+      ⚠️ 请勿让其他玩家看到你的角色信息
+    </view>
+  </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
+</view>

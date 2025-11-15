@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "查看身份",
+  "usingComponents": {
+    "rules-modal": "/components/rules-modal/rules-modal"
+  }
+}

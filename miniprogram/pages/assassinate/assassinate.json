@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "刺杀阶段",
+  "usingComponents": {
+    "rules-modal": "/components/rules-modal/rules-modal"
+  }
+}

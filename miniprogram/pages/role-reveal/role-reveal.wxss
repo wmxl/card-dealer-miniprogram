@@ -1,0 +1,196 @@
+/* pages/role-reveal/role-reveal.wxss */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40rpx;
+  position: relative;
+}
+
+.rules-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: white;
+  font-size: 32rpx;
+}
+
+.content {
+  padding-top: 40rpx;
+}
+
+.player-info {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.player-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+}
+
+.player-number {
+  display: block;
+  color: white;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.player-name {
+  display: block;
+  color: white;
+  font-size: 32rpx;
+}
+
+.role-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.role-card.good {
+  border-top: 8rpx solid #4caf50;
+}
+
+.role-card.evil {
+  border-top: 8rpx solid #f44336;
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #e5e5e5;
+}
+
+.role-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.role-side {
+  font-size: 28rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.good .role-side {
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.evil .role-side {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.role-message {
+  font-size: 30rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+  line-height: 1.6;
+}
+
+.see-players {
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.see-player-item {
+  padding: 20rpx;
+  background: white;
+  border-radius: 8rpx;
+  margin-bottom: 15rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.see-player-item:last-child {
+  margin-bottom: 0;
+}
+
+.see-player-number {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #667eea;
+  min-width: 80rpx;
+}
+
+.see-player-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.see-player-role {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.role-tip {
+  background: #fff3cd;
+  border-left: 4rpx solid #ffc107;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #856404;
+  line-height: 1.6;
+}
+
+.actions {
+  margin-bottom: 30rpx;
+}
+
+.btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.btn-confirm {
+  background: white;
+  color: #667eea;
+  font-weight: bold;
+}
+
+.btn-confirm[disabled] {
+  background: rgba(255, 255, 255, 0.5);
+  color: rgba(102, 126, 234, 0.5);
+}
+
+.warning {
+  text-align: center;
+  color: #ffe082;
+  font-size: 26rpx;
+  padding: 20rpx;
+  background: rgba(255, 193, 7, 0.2);
+  border-radius: 12rpx;
+}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "执行任务",
+  "usingComponents": {
+    "rules-modal": "/components/rules-modal/rules-modal"
+  }
+}

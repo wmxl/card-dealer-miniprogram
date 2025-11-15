@@ -1,0 +1,150 @@
+<!--pages/game/game.wxml-->
+<view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
+  <!-- 房间号 -->
+  <view class="room-header">
+    <text class="room-id-label">房间号：</text>
+    <text class="room-id-value">{{roomId}}</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <!-- 游戏进度 -->
+    <view class="game-progress">
+      <view class="mission-track">
+        <view
+          class="mission-item {{index <= currentMission ? 'active' : ''}} {{item.result}}"
+          wx:for="{{missionConfig}}"
+          wx:key="*this"
+        >
+          <view class="mission-number">任务{{index + 1}}</view>
+          <view class="mission-players">{{item.players}}人</view>
+          <view wx:if="{{missionResults[index]}}" class="mission-result">
+            {{missionResults[index].success ? '✓' : '✗'}}
+          </view>
+        </view>
+      </view>
+
+      <view class="score-display">
+        <view class="score-item good">
+          <text class="score-label">好人</text>
+          <text class="score-value">{{goodWins}}</text>
+        </view>
+        <view class="score-item evil">
+          <text class="score-label">坏人</text>
+          <text class="score-value">{{evilWins}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 当前状态 -->
+    <view class="status-section">
+      <view class="current-leader">
+        <text class="leader-label">当前队长：</text>
+        <text class="leader-number">{{currentLeader + 1}}号</text>
+        <text wx:if="{{isLeader}}" class="leader-badge">（你）</text>
+      </view>
+
+      <view wx:if="{{consecutiveRejects > 0}}" class="warning-banner">
+        ⚠️ 已连续否决{{consecutiveRejects}}次，再否决{{5 - consecutiveRejects}}次坏人直接获胜
+      </view>
+    </view>
+
+    <!-- 提名阶段 -->
+    <view wx:if="{{!votePhase && !missionPhase}}" class="nomination-section">
+      <view class="section-title">
+        任务{{currentMission + 1}}：选择{{missionConfig[currentMission].players}}人执行任务
+      </view>
+
+      <view wx:if="{{isLeader}}" class="leader-actions">
+        <view class="players-grid">
+          <view
+            class="player-card {{selectedPlayers.indexOf(item.player_number) > -1 ? 'selected' : ''}}"
+            wx:for="{{allPlayers}}"
+            wx:key="player_number"
+            data-player="{{item.player_number}}"
+            bindtap="togglePlayerSelection"
+          >
+            <text class="player-card-number">{{item.player_number}}</text>
+            <text class="player-card-name">{{item.nickname || '玩家' + item.player_number}}</text>
+          </view>
+        </view>
+
+        <view class="selected-count">
+          已选择：{{selectedPlayers.length}}/{{missionConfig[currentMission].players}}
+        </view>
+
+        <button
+          class="btn btn-primary"
+          bindtap="submitNomination"
+          disabled="{{selectedPlayers.length !== missionConfig[currentMission].players}}"
+        >
+          提交提名
+        </button>
+      </view>
+
+      <view wx:else class="waiting-message">
+        <text>等待队长提名玩家...</text>
+      </view>
+    </view>
+
+    <!-- 投票阶段 -->
+    <view wx:if="{{votePhase}}" class="vote-section">
+      <view class="section-title">投票阶段</view>
+
+      <view class="nominated-players">
+        <text class="nominated-label">提名玩家：</text>
+        <view class="nominated-list">
+          <view
+            class="nominated-player"
+            wx:for="{{nominatedPlayersInfo}}"
+            wx:key="number"
+          >
+            <text class="nom-number">{{item.number}}号</text>
+            <text class="nom-name">{{item.nickname}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="vote-buttons">
+        <button
+          class="btn btn-approve"
+          data-approve="true"
+          bindtap="vote"
+        >
+          赞成 👍
+        </button>
+        <button
+          class="btn btn-reject"
+          data-approve="false"
+          bindtap="vote"
+        >
+          反对 👎
+        </button>
+      </view>
+
+      <view class="vote-tip">
+        投票将公开显示，超过半数赞成则执行任务
+      </view>
+    </view>
+
+    <!-- 任务执行阶段 -->
+    <view wx:if="{{missionPhase}}" class="mission-section">
+      <view class="section-title">任务执行</view>
+
+      <view class="mission-message">
+        等待选中玩家执行任务...
+      </view>
+    </view>
+  </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
+</view>

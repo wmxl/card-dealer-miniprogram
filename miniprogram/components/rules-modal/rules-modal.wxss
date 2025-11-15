@@ -1,0 +1,139 @@
+/* components/rules-modal/rules-modal.wxss */
+.rules-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  position: relative;
+  width: 85%;
+  max-width: 600px;
+  max-height: 80vh;
+  background: white;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: white;
+}
+
+.close-btn {
+  width: 50rpx;
+  height: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: white;
+  cursor: pointer;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 40rpx;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-bottom: 10rpx;
+  border-bottom: 2rpx solid #667eea;
+}
+
+.section-content {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #666;
+}
+
+.content-line {
+  margin-bottom: 10rpx;
+}
+
+.content-line:empty {
+  height: 10rpx;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 20rpx 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 24rpx;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1rpx solid #e5e5e5;
+}
+
+.table-header {
+  background: #f5f5f5;
+  font-weight: bold;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 20rpx 10rpx;
+  text-align: center;
+  color: #666;
+  min-width: 80rpx;
+}
+
+.table-header .table-cell {
+  color: #333;
+}
+
+.section-note {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #fff3cd;
+  border-left: 4rpx solid #ffc107;
+  font-size: 26rpx;
+  color: #856404;
+  border-radius: 8rpx;
+}

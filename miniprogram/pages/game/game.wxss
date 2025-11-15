@@ -1,0 +1,380 @@
+/* pages/game/game.wxss */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40rpx;
+  position: relative;
+  padding-bottom: 100rpx;
+}
+
+.rules-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.room-header {
+  position: absolute;
+  top: 30rpx;
+  left: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.room-id-label {
+  opacity: 0.9;
+}
+
+.room-id-value {
+  font-weight: bold;
+  margin-left: 5rpx;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: white;
+  font-size: 32rpx;
+}
+
+.content {
+  padding-top: 20rpx;
+}
+
+/* 游戏进度 */
+.game-progress {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.mission-track {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.mission-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 10rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  margin: 0 5rpx;
+  position: relative;
+}
+
+.mission-item.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.mission-number {
+  font-size: 24rpx;
+  margin-bottom: 5rpx;
+}
+
+.mission-players {
+  font-size: 20rpx;
+  opacity: 0.8;
+}
+
+.mission-result {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.score-display {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #e5e5e5;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.score-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.score-value {
+  font-size: 48rpx;
+  font-weight: bold;
+}
+
+.score-item.good .score-value {
+  color: #4caf50;
+}
+
+.score-item.evil .score-value {
+  color: #f44336;
+}
+
+/* 状态区域 */
+.status-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.current-leader {
+  text-align: center;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.leader-label {
+  color: #666;
+}
+
+.leader-number {
+  font-weight: bold;
+  color: #667eea;
+  margin-left: 10rpx;
+}
+
+.leader-badge {
+  display: inline-block;
+  margin-left: 10rpx;
+  padding: 5rpx 15rpx;
+  background: #667eea;
+  color: white;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.warning-banner {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #fff3cd;
+  border-left: 4rpx solid #ffc107;
+  border-radius: 8rpx;
+  color: #856404;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+/* 提名阶段 */
+.nomination-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #e5e5e5;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15rpx;
+  margin-bottom: 30rpx;
+}
+
+.player-card {
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 30rpx 20rpx;
+  text-align: center;
+  border: 3rpx solid transparent;
+  transition: all 0.3s;
+}
+
+.player-card.selected {
+  background: #e8f5e9;
+  border-color: #4caf50;
+  position: relative;
+}
+
+.player-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 5rpx;
+  right: 5rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.player-card-number {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 10rpx;
+}
+
+.player-card-name {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.selected-count {
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.waiting-message {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 投票阶段 */
+.vote-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.nominated-players {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+}
+
+.nominated-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+  text-align: center;
+}
+
+.nominated-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.nominated-player {
+  background: white;
+  padding: 15rpx 20rpx;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.nom-number {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #667eea;
+  min-width: 60rpx;
+}
+
+.nom-name {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+.vote-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.vote-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 任务执行阶段 */
+.mission-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.mission-message {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 按钮 */
+.btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: bold;
+}
+
+.btn-primary[disabled] {
+  background: #cccccc;
+  color: #999;
+}
+
+.btn-approve {
+  flex: 1;
+  background: #4caf50;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-reject {
+  flex: 1;
+  background: #f44336;
+  color: white;
+  font-weight: bold;
+}

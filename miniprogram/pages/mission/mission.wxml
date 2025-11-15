@@ -1,0 +1,64 @@
+<!--pages/mission/mission.wxml-->
+<view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{!isParticipant}}" class="waiting-section">
+    <view class="waiting-icon">⏳</view>
+    <view class="waiting-text">等待任务执行中...</view>
+    <view class="waiting-desc">你不在本次任务执行队伍中</view>
+  </view>
+
+  <view wx:elif="{{submitted}}" class="submitted-section">
+    <view class="submitted-icon">✓</view>
+    <view class="submitted-text">已提交</view>
+    <view class="submitted-desc">等待其他玩家提交...</view>
+  </view>
+
+  <view wx:else class="mission-section">
+    <view class="mission-header">
+      <text class="mission-title">执行任务</text>
+      <text class="mission-subtitle">请选择你的行动</text>
+    </view>
+
+    <view class="role-reminder">
+      <view class="role-badge {{role.side}}">
+        {{role.name}}（{{role.side === 'good' ? '好人' : '坏人'}}）
+      </view>
+      <view class="role-tip">
+        {{role.side === 'good' ? '好人只能选择成功' : '坏人可以选择成功或失败'}}
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <button
+        class="btn btn-success"
+        data-success="true"
+        bindtap="submitMission"
+      >
+        ✓ 成功
+      </button>
+      <button
+        class="btn btn-fail"
+        data-success="false"
+        bindtap="submitMission"
+        disabled="{{role.side === 'good'}}"
+      >
+        ✗ 失败
+      </button>
+    </view>
+
+    <view class="warning">
+      ⚠️ 提交后无法修改，请慎重选择
+    </view>
+  </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
+</view>
