@@ -1,15 +1,20 @@
 <!--pages/create/create.wxml-->
 <view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
   <view class="header">
     <text class="title">创建房间</text>
-    <text class="subtitle">选择房间人数（2-12人）</text>
+    <text class="subtitle">选择房间人数（3-12人）</text>
   </view>
 
   <view class="content">
     <view class="player-selector">
       <view
         class="player-option {{maxPlayers === item ? 'active' : ''}}"
-        wx:for="{{[2,3,4,5,6,7,8,9,10,11,12]}}"
+        wx:for="{{[3,4,5,6,7,8,9,10,11,12]}}"
         wx:key="*this"
         data-value="{{item}}"
         bindtap="selectPlayers"
@@ -27,4 +32,7 @@
       创建房间
     </button>
   </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
 </view>

@@ -2,7 +2,11 @@
   "pages": [
     "pages/index/index",
     "pages/create/create",
-    "pages/room/room"
+    "pages/room/room",
+    "pages/role-reveal/role-reveal",
+    "pages/game/game",
+    "pages/mission/mission",
+    "pages/assassinate/assassinate"
   ],
   "window": {
     "backgroundTextStyle": "light",

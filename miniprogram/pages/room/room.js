@@ -9,7 +9,8 @@ Page({
     myPlayerNumber: 0,
     myLetter: '',
     loading: false,
-    gameStarted: false
+    gameStarted: false,
+    showRulesModal: false
   },
 
   onLoad(options) {
@@ -27,6 +28,8 @@ Page({
       }, 1500)
       return
     }
+
+    this.hasJumped = false // 防止重复跳转
 
     this.setData({
       roomId: roomId,
@@ -62,12 +65,22 @@ Page({
 
       if (res.result && res.result.room_id) {
         const data = res.result
+        const gameStarted = data.status !== 'waiting'
+
         this.setData({
           maxPlayers: data.max_players,
           currentPlayers: data.current_players,
           players: data.players,
-          gameStarted: data.status === 'started'
+          gameStarted: gameStarted
         })
+
+        // 如果游戏已开始，自动跳转到角色查看页面
+        if (gameStarted && this.data.myPlayerNumber > 0 && !this.hasJumped) {
+          this.hasJumped = true
+          wx.redirectTo({
+            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+          })
+        }
 
         // 检查自己的字母
         const myPlayer = data.players.find(p => p.player_number === this.data.myPlayerNumber)
@@ -88,17 +101,43 @@ Page({
   async joinRoom() {
     if (this.data.loading) return
 
+    // 获取缓存的昵称
+    const cachedNickname = wx.getStorageSync('user_nickname') || ''
+
+    // 弹窗输入昵称
+    wx.showModal({
+      title: '输入昵称',
+      editable: true,
+      placeholderText: '请输入昵称',
+      content: cachedNickname,
+      success: async (res) => {
+        if (res.confirm) {
+          const nickname = (res.content || '').trim()
+          if (nickname) {
+            // 保存昵称到缓存
+            wx.setStorageSync('user_nickname', nickname)
+            await this.doJoinRoom(nickname)
+          } else {
+            wx.showToast({
+              title: '请输入昵称',
+              icon: 'none'
+            })
+          }
+        }
+      }
+    })
+  },
+
+  // 执行加入房间
+  async doJoinRoom(nickname) {
     this.setData({ loading: true })
 
     try {
-      // 获取用户信息
-      const userInfo = await this.getUserInfo()
-
       const res = await wx.cloud.callFunction({
         name: 'joinRoom',
         data: {
           room_id: this.data.roomId,
-          nickname: userInfo.nickName || ''
+          nickname: nickname
         }
       })
 
@@ -132,36 +171,29 @@ Page({
     }
   },
 
-  // 获取用户信息
-  getUserInfo() {
-    return new Promise((resolve, reject) => {
-      wx.getUserProfile({
-        desc: '用于显示昵称',
-        success: (res) => {
-          resolve(res.userInfo)
-        },
-        fail: () => {
-          resolve({ nickName: '' })
-        }
-      })
-    })
-  },
-
-  // 发牌
+  // 分配角色
   async dealCards() {
     if (this.data.loading || this.data.gameStarted) return
 
-    if (this.data.currentPlayers < 2) {
+    if (this.data.currentPlayers < 3) {
       wx.showToast({
-        title: '至少需要2人',
+        title: '至少需要3人',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (this.data.currentPlayers > 12) {
+      wx.showToast({
+        title: '最多支持12人',
         icon: 'none'
       })
       return
     }
 
     wx.showModal({
-      title: '确认发牌',
-      content: '确定要发牌吗？发牌后所有人将看到分配的字母',
+      title: '确认分配角色',
+      content: `确定要开始游戏吗？将为${this.data.currentPlayers}名玩家分配角色`,
       success: async (res) => {
         if (res.confirm) {
           await this.doDealCards()
@@ -170,7 +202,7 @@ Page({
     })
   },
 
-  // 执行发牌
+  // 执行角色分配
   async doDealCards() {
     this.setData({ loading: true })
 
@@ -182,38 +214,30 @@ Page({
         }
       })
 
-      if (dealRes.result && dealRes.result.players) {
-        this.setData({
-          players: dealRes.result.players,
-          gameStarted: true,
-          loading: false
-        })
-
-        // 找到自己的字母
-        const myPlayer = dealRes.result.players.find(
-          p => p.player_number === this.data.myPlayerNumber
-        )
-        if (myPlayer) {
-          this.setData({
-            myLetter: myPlayer.letter
-          })
-        }
-
+      if (dealRes.result && dealRes.result.success) {
         wx.showToast({
-          title: '发牌成功',
-          icon: 'success'
+          title: '角色分配成功',
+          icon: 'success',
+          duration: 1500
         })
+
+        // 跳转到角色查看页面
+        setTimeout(() => {
+          wx.redirectTo({
+            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+          })
+        }, 1500)
       } else {
         wx.showToast({
-          title: dealRes.result?.error || '发牌失败',
+          title: dealRes.result?.error || '角色分配失败',
           icon: 'none'
         })
         this.setData({ loading: false })
       }
     } catch (error) {
-      console.error('发牌失败', error)
+      console.error('角色分配失败', error)
       wx.showToast({
-        title: '发牌失败，请重试',
+        title: '角色分配失败，请重试',
         icon: 'none'
       })
       this.setData({ loading: false })
@@ -226,6 +250,27 @@ Page({
       title: `桌游发牌助手 - 房间号：${this.data.roomId}`,
       path: `/pages/index/index?room_id=${this.data.roomId}`
     }
+  },
+
+  // 跳转到角色查看页面
+  goToRoleReveal() {
+    wx.redirectTo({
+      url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+    })
+  },
+
+  // 显示规则
+  showRules() {
+    this.setData({
+      showRulesModal: true
+    })
+  },
+
+  // 隐藏规则
+  hideRules() {
+    this.setData({
+      showRulesModal: false
+    })
   },
 
   // 重置房间（仅创建者）

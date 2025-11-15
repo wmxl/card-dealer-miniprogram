@@ -1,5 +1,6 @@
-// 云函数：发牌
+// 云函数：分配角色
 const cloud = require('wx-server-sdk')
+const { assignRoles, getMissionConfig } = require('./avalon-config')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -32,9 +33,15 @@ exports.main = async (event, context) => {
 
     const players = playersResult.data
 
-    if (players.length < 2) {
+    if (players.length < 3) {
       return {
-        error: '至少需要2人才能发牌'
+        error: '至少需要3人才能开始游戏'
+      }
+    }
+
+    if (players.length > 12) {
+      return {
+        error: '最多支持12人游戏'
       }
     }
 
@@ -44,67 +51,58 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 检查是否已经发过牌
-    const hasDealt = players.some(p => p.letter && p.letter !== '')
+    // 检查是否已经分配过角色
+    const hasDealt = players.some(p => p.role && p.role.code)
     if (hasDealt) {
       return {
-        error: '已经发过牌了'
+        error: '已经分配过角色了'
       }
     }
 
-    // 生成字母列表（从A开始，根据人数递增）
-    const letters = []
-    for (let i = 0; i < players.length; i++) {
-      letters.push(String.fromCharCode(65 + i)) // 65是'A'的ASCII码
-    }
+    // 分配角色
+    const playersWithRoles = assignRoles(players)
 
-    // 随机打乱字母
-    for (let i = letters.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [letters[i], letters[j]] = [letters[j], letters[i]]
-    }
-
-    // 分配字母给玩家
-    const updatePromises = players.map((player, index) => {
+    // 更新玩家角色信息
+    const updatePromises = playersWithRoles.map((player) => {
       return db.collection('players').doc(player._id).update({
         data: {
-          letter: letters[index]
+          role: player.role
         }
       })
     })
 
     await Promise.all(updatePromises)
 
-    // 更新房间状态
+    // 获取任务配置
+    const missionConfig = getMissionConfig(players.length)
+
+    // 更新房间状态和任务配置
     await db.collection('rooms').doc(room_id).update({
       data: {
-        status: 'started',
+        status: 'role_reveal',  // 角色查看阶段
+        game_state: {
+          current_mission: 0,  // 当前任务索引（0-4）
+          current_round: 0,    // 当前轮次（从0开始）
+          current_leader: 0,   // 当前队长（玩家编号-1）
+          mission_results: [], // 任务结果
+          vote_history: [],    // 投票历史
+          consecutive_rejects: 0, // 连续否决次数
+          good_wins: 0,        // 好人胜利次数
+          evil_wins: 0         // 坏人胜利次数
+        },
+        mission_config: missionConfig,
         updated_at: db.serverDate()
       }
     })
 
-    // 获取分配结果
-    const resultPlayers = await db.collection('players')
-      .where({
-        room_id: room_id
-      })
-      .orderBy('player_number', 'asc')
-      .get()
-
-    const player_list = resultPlayers.data.map(p => ({
-      player_number: p.player_number,
-      nickname: p.nickname || `玩家${p.player_number}`,
-      letter: p.letter
-    }))
-
     return {
       room_id: room_id,
-      players: player_list,
-      message: '发牌成功'
+      success: true,
+      message: '角色分配成功，请查看身份'
     }
   } catch (error) {
     return {
-      error: '发牌失败',
+      error: '角色分配失败',
       details: error.message
     }
   }

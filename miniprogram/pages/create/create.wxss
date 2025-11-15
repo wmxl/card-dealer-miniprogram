@@ -3,6 +3,19 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 40rpx;
+  position: relative;
+}
+
+.rules-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
 }
 
 .header {

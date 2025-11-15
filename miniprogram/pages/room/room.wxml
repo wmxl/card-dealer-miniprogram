@@ -1,5 +1,10 @@
 <!--pages/room/room.wxml-->
 <view class="container">
+  <!-- 规则按钮 -->
+  <view class="rules-btn" bindtap="showRules">
+    <text>📖 规则</text>
+  </view>
+
   <view class="header">
     <view class="room-info">
       <text class="room-id">房间号：{{roomId}}</text>
@@ -35,31 +40,16 @@
           class="btn btn-primary"
           bindtap="dealCards"
           loading="{{loading}}"
-          disabled="{{currentPlayers < 2}}"
+          disabled="{{currentPlayers < 3 || currentPlayers > 12}}"
         >
-          发牌（需{{currentPlayers < 2 ? 2 - currentPlayers + '人' : ''}}）
+          开始游戏（{{currentPlayers < 3 ? '需' + (3 - currentPlayers) + '人' : currentPlayers + '人游戏'}}）
         </button>
-        <text wx:else class="waiting-text">等待房主发牌...</text>
-      </view>
-    </view>
+        <text wx:else class="waiting-text">等待房主开始游戏...</text>
 
-    <!-- 已发牌 -->
-    <view wx:else class="result-section">
-      <view class="my-letter-card">
-        <text class="label">你的字母</text>
-        <text class="letter">{{myLetter}}</text>
-      </view>
+        <button class="btn btn-share" open-type="share">
+          分享房间
+        </button>
 
-      <view class="players-result">
-        <view class="result-title">所有玩家分配结果</view>
-        <view class="player-result-item" wx:for="{{players}}" wx:key="player_number">
-          <text class="result-number">{{item.player_number}}号</text>
-          <text class="result-name">{{item.nickname || '玩家' + item.player_number}}</text>
-          <text class="result-letter">{{item.letter}}</text>
-        </view>
-      </view>
-
-      <view class="actions">
         <button
           wx:if="{{isCreator}}"
           class="btn btn-secondary"
@@ -67,10 +57,28 @@
         >
           重置房间
         </button>
-        <button class="btn btn-share" open-type="share">
-          分享房间
+      </view>
+    </view>
+
+    <!-- 已开始游戏 -->
+    <view wx:else class="result-section">
+      <view class="game-started-tip">
+        <text class="tip-icon">🎮</text>
+        <text class="tip-text">游戏已开始</text>
+        <text class="tip-desc">请查看你的角色身份</text>
+      </view>
+
+      <view class="actions">
+        <button
+          class="btn btn-primary"
+          bindtap="goToRoleReveal"
+        >
+          查看身份
         </button>
       </view>
     </view>
   </view>
+
+  <!-- 规则弹窗 -->
+  <rules-modal show="{{showRulesModal}}" bind:close="hideRules"></rules-modal>
 </view>

@@ -7,6 +7,19 @@
   align-items: center;
   justify-content: center;
   padding: 40rpx;
+  position: relative;
+}
+
+.rules-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  color: white;
+  font-size: 28rpx;
+  z-index: 10;
 }
 
 .header {
@@ -53,6 +66,45 @@
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   border: 2rpx solid rgba(255, 255, 255, 0.5);
+}
+
+.btn-continue {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #fff;
+  font-weight: bold;
+}
+
+.continue-section {
+  margin-bottom: 40rpx;
+}
+
+.continue-info {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.continue-label {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10rpx;
+}
+
+.continue-room {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10rpx;
+}
+
+.continue-player {
+  display: block;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .divider {

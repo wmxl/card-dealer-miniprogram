@@ -41,7 +41,9 @@ exports.main = async (event, context) => {
       max_players: room.max_players,
       status: room.status,
       current_players: players.length,
-      players: players
+      players: players,
+      game_state: room.game_state || {},
+      mission_config: room.mission_config || []
     }
   } catch (error) {
     return {

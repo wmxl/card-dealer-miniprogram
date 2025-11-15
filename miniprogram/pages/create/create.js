@@ -1,8 +1,9 @@
 // pages/create/create.js
 Page({
   data: {
-    maxPlayers: 12,
-    loading: false
+    maxPlayers: 5,
+    loading: false,
+    showRulesModal: false
   },
 
   // 选择人数
@@ -13,18 +14,17 @@ Page({
     })
   },
 
-  // 获取用户信息
-  getUserInfo() {
-    return new Promise((resolve, reject) => {
-      wx.getUserProfile({
-        desc: '用于显示昵称',
-        success: (res) => {
-          resolve(res.userInfo)
-        },
-        fail: () => {
-          resolve({ nickName: '' })
-        }
-      })
+  // 显示规则
+  showRules() {
+    this.setData({
+      showRulesModal: true
+    })
+  },
+
+  // 隐藏规则
+  hideRules() {
+    this.setData({
+      showRulesModal: false
     })
   },
 
@@ -32,6 +32,35 @@ Page({
   async createRoom() {
     if (this.data.loading) return
 
+    // 获取缓存的昵称
+    const cachedNickname = wx.getStorageSync('user_nickname') || ''
+
+    // 弹窗输入昵称
+    wx.showModal({
+      title: '输入昵称',
+      editable: true,
+      placeholderText: '请输入昵称',
+      content: cachedNickname,
+      success: async (res) => {
+        if (res.confirm) {
+          const nickname = (res.content || '').trim()
+          if (nickname) {
+            // 保存昵称到缓存
+            wx.setStorageSync('user_nickname', nickname)
+            await this.doCreateRoom(nickname)
+          } else {
+            wx.showToast({
+              title: '请输入昵称',
+              icon: 'none'
+            })
+          }
+        }
+      }
+    })
+  },
+
+  // 执行创建房间
+  async doCreateRoom(nickname) {
     this.setData({ loading: true })
 
     try {
@@ -56,17 +85,24 @@ Page({
 
       // 2. 自动加入房间
       try {
-        const userInfo = await this.getUserInfo()
-
         const joinRes = await wx.cloud.callFunction({
           name: 'joinRoom',
           data: {
             room_id: roomId,
-            nickname: userInfo.nickName || ''
+            nickname: nickname
           }
         })
 
         if (joinRes.result && joinRes.result.player_number) {
+          // 保存房间信息到缓存
+          wx.setStorageSync('current_room', {
+            room_id: roomId,
+            player_number: joinRes.result.player_number,
+            nickname: nickname,
+            is_creator: true,
+            timestamp: Date.now()
+          })
+
           // 3. 跳转到房间页面，并传递玩家编号
           wx.redirectTo({
             url: `/pages/room/room?room_id=${roomId}&is_creator=true&player_number=${joinRes.result.player_number}`
