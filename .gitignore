@@ -1,4 +1,4 @@
-# Python
+# Python (保留，以防以后需要)
 __pycache__/
 *.py[cod]
 *$py.class
@@ -19,14 +19,40 @@ ENV/
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
 
 # OS
 .DS_Store
 Thumbs.db
+.DS_Store?
 
 # Environment
 .env
 .env.local
+.env.*.local
 
 # WeChat MiniProgram
 miniprogram/node_modules/
+miniprogram/.wx/
+miniprogram/.wx/
+*.log
+*.log.*
+
+# 微信开发者工具生成的文件
+miniprogram/project.private.config.json
+project.private.config.json
+
+# 云函数依赖
+miniprogram/cloudfunctions/*/node_modules/
+miniprogram/cloudfunctions/*/.wx/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 备份文件
+*.bak
+*.backup
+*~

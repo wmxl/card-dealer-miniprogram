@@ -14,7 +14,7 @@ App({
         //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
         //   此处请填入环境 ID, 环境 ID 可打开云控制台查看
         //   如不填则使用默认环境（第一个创建的环境）
-        env: 'your-env-id', // 需要替换为你的云环境ID
+        env: 'cloud1-7gdxiqxud6591054', // 云环境ID
         traceUser: true,
       })
     }
