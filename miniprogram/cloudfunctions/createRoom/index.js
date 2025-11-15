@@ -11,23 +11,21 @@ exports.main = async (event, context) => {
   const { max_players } = event
 
   // 验证人数范围
-  if (max_players < 5 || max_players > 10) {
+  if (max_players < 2 || max_players > 12) {
     return {
-      error: '人数必须在5-10人之间'
+      error: '人数必须在2-12人之间'
     }
   }
 
-  // 生成6位房间ID
+  // 生成4位数字房间ID
   const generateRoomId = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    let roomId = ''
-    for (let i = 0; i < 6; i++) {
-      roomId += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return roomId
+    // 生成1000-9999之间的随机数字
+    const min = 1000
+    const max = 9999
+    return Math.floor(Math.random() * (max - min + 1)) + min
   }
 
-  let roomId = generateRoomId()
+  let roomId = generateRoomId().toString()
 
   // 确保房间ID唯一
   let exists = true
@@ -39,7 +37,7 @@ exports.main = async (event, context) => {
     if (result.data.length === 0) {
       exists = false
     } else {
-      roomId = generateRoomId()
+      roomId = generateRoomId().toString()
     }
   }
 

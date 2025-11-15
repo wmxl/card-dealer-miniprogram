@@ -32,9 +32,9 @@ exports.main = async (event, context) => {
 
     const players = playersResult.data
 
-    if (players.length < 5) {
+    if (players.length < 2) {
       return {
-        error: '至少需要5人才能发牌'
+        error: '至少需要2人才能发牌'
       }
     }
 

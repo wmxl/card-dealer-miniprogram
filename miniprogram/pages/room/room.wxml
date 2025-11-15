@@ -35,9 +35,9 @@
           class="btn btn-primary"
           bindtap="dealCards"
           loading="{{loading}}"
-          disabled="{{currentPlayers < 5}}"
+          disabled="{{currentPlayers < 2}}"
         >
-          发牌（需{{currentPlayers < 5 ? 5 - currentPlayers + '人' : ''}}）
+          发牌（需{{currentPlayers < 2 ? 2 - currentPlayers + '人' : ''}}）
         </button>
         <text wx:else class="waiting-text">等待房主发牌...</text>
       </view>

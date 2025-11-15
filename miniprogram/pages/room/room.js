@@ -15,6 +15,7 @@ Page({
   onLoad(options) {
     const roomId = options.room_id
     const isCreator = options.is_creator === 'true'
+    const playerNumber = options.player_number ? parseInt(options.player_number) : 0
 
     if (!roomId) {
       wx.showToast({
@@ -29,7 +30,8 @@ Page({
 
     this.setData({
       roomId: roomId,
-      isCreator: isCreator
+      isCreator: isCreator,
+      myPlayerNumber: playerNumber // 如果是创建者，自动设置玩家编号
     })
 
     // 加载房间信息
@@ -149,9 +151,9 @@ Page({
   async dealCards() {
     if (this.data.loading || this.data.gameStarted) return
 
-    if (this.data.currentPlayers < 5) {
+    if (this.data.currentPlayers < 2) {
       wx.showToast({
-        title: '至少需要5人',
+        title: '至少需要2人',
         icon: 'none'
       })
       return
