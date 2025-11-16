@@ -47,18 +47,18 @@
 
       <view class="score-display">
         <view class="score-item good">
-          <text class="score-label">好人</text>
+          <text class="score-label">成功次数</text>
           <text class="score-value">{{goodWins}}</text>
         </view>
         <view class="score-item evil">
-          <text class="score-label">坏人</text>
+          <text class="score-label">失败次数</text>
           <text class="score-value">{{evilWins}}</text>
         </view>
       </view>
     </view>
 
     <!-- 当前状态 -->
-    <view class="status-section">
+    <view wx:if="{{!reviewMode}}" class="status-section">
       <view class="current-leader">
         <text class="leader-label">当前队长：</text>
         <text class="leader-number">{{currentLeader + 1}}号</text>
@@ -69,9 +69,24 @@
         ⚠️ 已连续否决{{consecutiveRejects}}次，再否决{{5 - consecutiveRejects}}次坏人直接获胜
       </view>
     </view>
+    <!-- 复盘面板 -->
+    <view wx:if="{{reviewMode}}" class="result-panel">
+      <view class="result-title">{{gameResultTitle}}</view>
+      <view wx:if="{{gameResultReason}}" class="result-reason">{{gameResultReason}}</view>
+      <view class="role-list">
+        <view class="role-item" wx:for="{{allPlayers}}" wx:key="player_number">
+          <text class="role-number">{{item.player_number}}号</text>
+          <text class="role-name">{{item.nickname}}</text>
+          <text wx:if="{{item.role}}" class="role-badge {{item.role.side || ''}}">
+            {{item.role.name}}
+          </text>
+          <text wx:if="{{!item.role}}" class="role-badge">未知身份</text>
+        </view>
+      </view>
+    </view>
 
     <!-- 提名阶段 -->
-    <view wx:if="{{!votePhase && !missionPhase}}" class="nomination-section">
+    <view wx:if="{{!votePhase && !missionPhase && !reviewMode}}" class="nomination-section">
       <view class="section-title">
         任务{{currentMission + 1}}：选择{{missionConfig[currentMission].players}}人执行任务
       </view>
@@ -110,7 +125,7 @@
     </view>
 
     <!-- 投票阶段 -->
-    <view wx:if="{{votePhase}}" class="vote-section">
+    <view wx:if="{{votePhase && !reviewMode}}" class="vote-section">
       <view class="section-title">投票阶段</view>
 
       <view class="nominated-players">
@@ -152,7 +167,7 @@
     </view>
 
     <!-- 任务执行阶段 -->
-    <view wx:if="{{missionPhase}}" class="mission-section">
+    <view wx:if="{{missionPhase && !reviewMode}}" class="mission-section">
       <view class="section-title">任务执行</view>
 
       <view class="mission-message">

@@ -111,10 +111,10 @@ exports.main = async (event, context) => {
           updated_at: db.serverDate()
         }
       : {
-          [`game_state.votes.${playerNum}`]: approve,
-          'game_state.vote_count': _.inc(1),
-          updated_at: db.serverDate()
-        }
+      [`game_state.votes.${playerNum}`]: approve,
+      'game_state.vote_count': _.inc(1),
+      updated_at: db.serverDate()
+    }
 
     await db.collection('rooms').doc(room_id).update({
       data: updateData
@@ -219,7 +219,7 @@ async function processVoteResult(room_id, room, votes, totalPlayers) {
         'game_state.vote_history': voteHistory,
         'game_state.consecutive_rejects': 0,
         'game_state.votes': _.set({}), // 清空投票记录
-        'game_state.vote_count': 0,
+          'game_state.vote_count': 0,
         'game_state.votes_round': -1,
         'game_state.mission_submissions': {},
         updated_at: db.serverDate()

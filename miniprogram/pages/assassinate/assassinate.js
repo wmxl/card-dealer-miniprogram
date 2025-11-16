@@ -8,7 +8,8 @@ Page({
     allPlayers: [],
     selectedPlayer: 0,
     showRulesModal: false,
-    loading: true
+    loading: true,
+    resultShown: false
   },
 
   onLoad(options) {
@@ -32,6 +33,13 @@ Page({
     })
 
     this.loadGameInfo()
+    this.startStatusWatcher()
+  },
+
+  onUnload() {
+    if (this.statusTimer) {
+      clearInterval(this.statusTimer)
+    }
   },
 
   // 加载游戏信息
@@ -68,6 +76,35 @@ Page({
     } catch (error) {
       console.error('加载游戏信息失败', error)
       this.setData({ loading: false })
+    }
+  },
+
+  startStatusWatcher() {
+    if (this.statusTimer) {
+      clearInterval(this.statusTimer)
+    }
+    this.statusTimer = setInterval(() => {
+      this.checkRoomStatus()
+    }, 3000)
+  },
+
+  async checkRoomStatus() {
+    if (this.data.resultShown) {
+      return
+    }
+    try {
+      const roomRes = await wx.cloud.callFunction({
+        name: 'getRoomInfo',
+        data: {
+          room_id: this.data.roomId
+        }
+      })
+
+      if (roomRes.result && roomRes.result.status === 'finished') {
+        this.handleGameFinished(roomRes.result.game_state)
+      }
+    } catch (error) {
+      console.error('检查房间状态失败', error)
     }
   },
 
@@ -114,23 +151,8 @@ Page({
       })
 
       if (res.result && res.result.success) {
-        // 显示结果
-        const isMerlin = res.result.is_merlin
-        const winner = res.result.winner
-
-        wx.showModal({
-          title: '游戏结束',
-          content: isMerlin
-            ? `刺杀成功！${this.data.selectedPlayer}号是梅林，坏人获胜！`
-            : `刺杀失败！${this.data.selectedPlayer}号不是梅林，好人获胜！`,
-          showCancel: false,
-          success: () => {
-            // 返回房间页面
-            wx.redirectTo({
-              url: `/pages/room/room?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
-            })
-          }
-        })
+        this.setData({ resultShown: true })
+        this.redirectToGame()
       } else {
         wx.showToast({
           title: res.result?.error || '刺杀失败',
@@ -144,6 +166,20 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  handleGameFinished(gameState = {}) {
+    if (this.data.resultShown) {
+      return
+    }
+    this.setData({ resultShown: true })
+    this.redirectToGame()
+  },
+
+  redirectToGame() {
+    wx.redirectTo({
+      url: `/pages/game/game?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
+    })
   },
 
   // 显示规则

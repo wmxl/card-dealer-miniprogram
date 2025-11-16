@@ -39,12 +39,22 @@ exports.main = async (event, context) => {
       .orderBy('player_number', 'asc')
       .get()
 
-    const players = playersResult.data.map(p => ({
-      player_number: p.player_number,
-      nickname: p.nickname || `玩家${p.player_number}`,
-      letter: p.letter || '',
-      vote_history: normalizeVoteHistory(p.vote_history)
-    }))
+    const includeRoles = room.status === 'finished'
+
+    const players = playersResult.data.map(p => {
+      const playerData = {
+        player_number: p.player_number,
+        nickname: p.nickname || `玩家${p.player_number}`,
+        letter: p.letter || '',
+        vote_history: normalizeVoteHistory(p.vote_history)
+      }
+
+      if (includeRoles && p.role) {
+        playerData.role = p.role
+      }
+
+      return playerData
+    })
 
     return {
       room_id: room._id,

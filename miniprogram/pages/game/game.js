@@ -49,7 +49,10 @@ Page({
     voteHistoryModalVisible: false,
     voteHistoryMission: 0,
     voteHistoryRounds: [],
-    voteHistoryEmpty: true
+    voteHistoryEmpty: true,
+    reviewMode: false,
+    gameResultTitle: '',
+    gameResultReason: ''
   },
 
   onLoad(options) {
@@ -69,6 +72,7 @@ Page({
 
     this.hasMissionJumped = false // 防止重复跳转到任务页面
     this.hasResetJumped = false // 防止重复跳转到首页
+    this.hasShownResult = false // 防止重复展示结果弹窗
     this.voteSnapshot = '' // 兼容旧逻辑的字段，后续可移除
 
     console.log('游戏页面加载，重置投票状态')
@@ -109,6 +113,9 @@ Page({
         const data = res.result
         const gameState = data.game_state || {}
         const currentLeader = gameState.current_leader || 0
+        const isFinished = data.status === 'finished'
+        const winnerText = isFinished ? this.formatWinnerText(gameState.winner) : ''
+        const winnerReason = isFinished ? (gameState.win_reason || '') : ''
 
         console.log('游戏状态加载成功', {
           mission_config: data.mission_config,
@@ -163,7 +170,10 @@ Page({
           isLeader: currentLeader === this.data.playerNumber - 1,
           selectedPlayers: selectedPlayers, // 避免定时刷新覆盖用户选择
           selectedPlayersMap: selectedPlayersMap, // 使用映射对象
-          loading: false
+          loading: false,
+          reviewMode: isFinished,
+          gameResultTitle: isFinished ? winnerText : '',
+          gameResultReason: isFinished ? winnerReason : ''
         })
 
         // 检查游戏状态
@@ -222,7 +232,8 @@ Page({
       // 不在这里重置 selectedPlayers，因为在 loadGameState 中已经处理
       this.setData({
         votePhase: false,
-        missionPhase: false
+        missionPhase: false,
+        reviewMode: false
       })
     } else if (status === 'voting') {
       // 处理提名玩家信息
@@ -525,6 +536,16 @@ Page({
     })
   },
 
+  formatWinnerText(winner) {
+    if (winner === 'good') {
+      return '好人胜利'
+    }
+    if (winner === 'evil') {
+      return '坏人胜利'
+    }
+    return '游戏结束'
+  },
+
   // 显示规则
   showRules() {
     this.setData({
@@ -556,8 +577,14 @@ Page({
         })
 
         if (res.result && res.result.success) {
+          const roleData = {
+            ...(res.result.role || {}),
+            message: res.result.message,
+            tip: res.result.tip,
+            seePlayers: res.result.seePlayers
+          }
           this.setData({
-            role: res.result,
+            role: roleData,
             showRoleModal: true
           })
         } else {
@@ -635,6 +662,32 @@ Page({
 
   // 显示游戏结果
   showGameResult() {
-    // TODO: 实现游戏结果页面
+    if (this.hasShownResult) {
+      return
+    }
+    this.hasShownResult = true
+
+    const winner = this.data.gameState?.winner
+    const winReason = this.data.gameState?.win_reason
+
+    const winnerText = this.formatWinnerText(winner)
+
+    const contentLines = []
+    contentLines.push(winnerText)
+    if (winReason) {
+      contentLines.push(winReason)
+    }
+
+    this.setData({
+      reviewMode: true,
+      gameResultTitle: winnerText,
+      gameResultReason: winReason || ''
+    })
+
+    wx.showModal({
+      title: '游戏结束',
+      content: contentLines.join('\n'),
+      showCancel: false
+    })
   }
 })
