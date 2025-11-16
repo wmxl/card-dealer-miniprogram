@@ -18,7 +18,7 @@
         <text class="continue-room">房间：{{currentRoom.room_id}}</text>
         <text class="continue-player">{{currentRoom.nickname}} ({{currentRoom.player_number}}号)</text>
       </view>
-      <button class="btn btn-continue" bindtap="continueGame" style="position: relative; left: 0rpx; top: 12rpx">继续游戏</button>
+      <button class="btn btn-continue" bindtap="continueGame">继续游戏</button>
 
       <view class="divider">
         <text>或</text>
@@ -39,7 +39,7 @@
         bindinput="inputRoomId"
         maxlength="6"
       />
-      <button class="btn btn-secondary" bindtap="joinRoom" style="position: relative; left: 0rpx; top: 5rpx">加入房间</button>
+      <button class="btn btn-secondary join-btn" bindtap="joinRoom">加入房间</button>
     </view>
   </view>
 

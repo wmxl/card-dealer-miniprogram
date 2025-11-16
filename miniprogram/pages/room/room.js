@@ -1,4 +1,23 @@
 // pages/room/room.js
+
+function getRoleSeenKey(roomId, playerNumber, gameId) {
+  const normalizedPlayerNumber = parseInt(playerNumber, 10)
+  if (!roomId || !normalizedPlayerNumber || !gameId) {
+    return ''
+  }
+  return `role_seen_${roomId}_${normalizedPlayerNumber}_${gameId}`
+}
+
+function hasRoleBeenSeen(roomId, playerNumber, gameId) {
+  const key = getRoleSeenKey(roomId, playerNumber, gameId)
+  if (!key) return false
+  const stored = wx.getStorageSync(key)
+  if (stored && typeof stored === 'object') {
+    return !!stored.seen
+  }
+  return !!stored
+}
+
 Page({
   data: {
     roomId: '',
@@ -10,7 +29,8 @@ Page({
     myLetter: '',
     loading: false,
     gameStarted: false,
-    showRulesModal: false
+    showRulesModal: false,
+    currentGameId: ''
   },
 
   onLoad(options) {
@@ -66,6 +86,7 @@ Page({
       if (res.result && res.result.room_id) {
         const data = res.result
         const gameStarted = data.status !== 'waiting'
+        const gameId = (data.game_state && data.game_state.game_id) || ''
 
         // 检查当前玩家是否是房主（1号玩家）
         const isCreator = this.data.myPlayerNumber === 1
@@ -75,14 +96,17 @@ Page({
           currentPlayers: data.current_players,
           players: data.players,
           gameStarted: gameStarted,
-          isCreator: isCreator || this.data.isCreator // 保留原有的isCreator，或者根据玩家编号判断
+          isCreator: isCreator || this.data.isCreator, // 保留原有的isCreator，或者根据玩家编号判断
+          currentGameId: gameId
         })
 
         // 如果游戏已开始，自动跳转到角色查看页面
         if (gameStarted && this.data.myPlayerNumber > 0 && !this.hasJumped) {
+          const skipRoleReveal = this.shouldSkipRoleReveal(gameId)
+          const targetUrl = skipRoleReveal ? this.buildGameUrl() : this.buildRoleRevealUrl(gameId)
           this.hasJumped = true
           wx.redirectTo({
-            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+            url: targetUrl
           })
         }
 
@@ -219,6 +243,10 @@ Page({
       })
 
       if (dealRes.result && dealRes.result.success) {
+        const newGameId = dealRes.result.game_id || ''
+        if (newGameId) {
+          this.setData({ currentGameId: newGameId })
+        }
         wx.showToast({
           title: '角色分配成功',
           icon: 'success',
@@ -227,8 +255,9 @@ Page({
 
         // 跳转到角色查看页面
         setTimeout(() => {
+          this.hasJumped = true
           wx.redirectTo({
-            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+            url: this.buildRoleRevealUrl(newGameId)
           })
         }, 1500)
       } else {
@@ -259,7 +288,7 @@ Page({
   // 跳转到角色查看页面
   goToRoleReveal() {
     wx.redirectTo({
-      url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+      url: this.buildRoleRevealUrl()
     })
   },
 
@@ -326,5 +355,19 @@ Page({
         }
       }
     })
+  },
+
+  buildRoleRevealUrl(gameId = '') {
+    const effectiveGameId = gameId || this.data.currentGameId
+    const extra = effectiveGameId ? `&game_id=${effectiveGameId}` : ''
+    return `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}${extra}`
+  },
+
+  buildGameUrl() {
+    return `/pages/game/game?room_id=${this.data.roomId}&player_number=${this.data.myPlayerNumber}`
+  },
+
+  shouldSkipRoleReveal(gameId) {
+    return hasRoleBeenSeen(this.data.roomId, this.data.myPlayerNumber, gameId)
   }
 })

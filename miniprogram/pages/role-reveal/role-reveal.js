@@ -1,4 +1,14 @@
 // pages/role-reveal/role-reveal.js
+const ROLE_DISPLAY_DURATION = 3000
+
+function getRoleSeenStorageKey(roomId, playerNumber, gameId) {
+  const normalizedPlayer = parseInt(playerNumber, 10)
+  if (!roomId || !normalizedPlayer || !gameId) {
+    return ''
+  }
+  return `role_seen_${roomId}_${normalizedPlayer}_${gameId}`
+}
+
 Page({
   data: {
     roomId: '',
@@ -10,12 +20,14 @@ Page({
     tip: '',
     loading: true,
     showRulesModal: false,
-    confirmed: false
+    confirmed: false,
+    gameId: ''
   },
 
   onLoad(options) {
     const roomId = options.room_id
     const playerNumber = parseInt(options.player_number)
+    const gameId = options.game_id || ''
 
     if (!roomId || !playerNumber) {
       wx.showToast({
@@ -30,7 +42,8 @@ Page({
 
     this.setData({
       roomId: roomId,
-      playerNumber: playerNumber
+      playerNumber: playerNumber,
+      gameId: gameId
     })
 
     this.loadRoleInfo()
@@ -57,10 +70,12 @@ Page({
           loading: false
         })
 
-        // 自动确认并进入游戏（延迟2秒，让玩家能看到身份）
+        this.markRoleAsSeen()
+
+        // 自动确认并进入游戏（延迟3秒，让玩家能看到身份）
         setTimeout(() => {
           this.autoEnterGame()
-        }, 2000)
+        }, ROLE_DISPLAY_DURATION)
       } else {
         wx.showToast({
           title: res.result?.error || '加载失败',
@@ -122,6 +137,15 @@ Page({
   hideRules() {
     this.setData({
       showRulesModal: false
+    })
+  },
+
+  markRoleAsSeen() {
+    const key = getRoleSeenStorageKey(this.data.roomId, this.data.playerNumber, this.data.gameId)
+    if (!key) return
+    wx.setStorageSync(key, {
+      seen: true,
+      timestamp: Date.now()
     })
   }
 })

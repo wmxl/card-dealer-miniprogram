@@ -1,5 +1,7 @@
 // pages/game/game.js
 
+const MAX_CONSECUTIVE_REJECTS = 3 // 连续否决达到 3 次则坏人胜利
+
 function normalizeVoteHistory(history) {
   if (!Array.isArray(history)) {
     return Array.from({ length: 5 }, () => [])
@@ -31,6 +33,8 @@ Page({
     consecutiveRejects: 0,
     goodWins: 0,
     evilWins: 0,
+    maxConsecutiveRejects: MAX_CONSECUTIVE_REJECTS,
+    rejectsUntilLoss: MAX_CONSECUTIVE_REJECTS,
 
     // UI状态
     isLeader: false,
@@ -83,6 +87,10 @@ Page({
       lastVotingRound: -1, // 重置投票轮次
       lastGameStatus: null, // 重置游戏状态
       lastVoteKey: ''
+    })
+
+    wx.setNavigationBarTitle({
+      title: `房间号：${roomId}`
     })
 
     this.loadGameState()
@@ -156,6 +164,9 @@ Page({
           selectedPlayersMap: selectedPlayersMap
         })
 
+        const consecutiveRejects = gameState.consecutive_rejects || 0
+        const rejectsUntilLoss = Math.max(0, MAX_CONSECUTIVE_REJECTS - consecutiveRejects)
+
         this.setData({
           gameState: gameState,
           missionConfig: data.mission_config || [],
@@ -164,7 +175,8 @@ Page({
           currentRound: gameState.current_round || 0,
           currentLeader: currentLeader,
           missionResults: gameState.mission_results || [],
-          consecutiveRejects: gameState.consecutive_rejects || 0,
+          consecutiveRejects: consecutiveRejects,
+          rejectsUntilLoss: rejectsUntilLoss,
           goodWins: gameState.good_wins || 0,
           evilWins: gameState.evil_wins || 0,
           isLeader: currentLeader === this.data.playerNumber - 1,
@@ -222,9 +234,11 @@ Page({
           icon: 'success',
           duration: 1500
         })
+        const gameId = this.data.gameState?.game_id || ''
+        const gameIdParam = gameId ? `&game_id=${gameId}` : ''
         setTimeout(() => {
           wx.redirectTo({
-            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
+            url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}${gameIdParam}`
           })
         }, 1500)
       }
@@ -638,9 +652,11 @@ Page({
                 duration: 1500
               })
               setTimeout(() => {
-                wx.redirectTo({
-                  url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
-                })
+        const gameId = this.data.gameState?.game_id || ''
+        const gameIdParam = gameId ? `&game_id=${gameId}` : ''
+        wx.redirectTo({
+          url: `/pages/role-reveal/role-reveal?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}${gameIdParam}`
+        })
               }, 1500)
             } else {
               wx.showToast({

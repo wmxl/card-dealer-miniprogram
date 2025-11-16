@@ -1,13 +1,13 @@
 <!--components/rules-modal/rules-modal.wxml-->
-<view class="rules-modal" wx:if="{{show}}" catchtouchmove="preventScroll">
-  <view class="modal-mask" bindtap="close"></view>
+<view class="rules-modal" wx:if="{{show}}">
+  <view class="modal-mask" bindtap="close" catchtouchmove="preventScroll"></view>
   <view class="modal-content">
     <view class="modal-header">
       <text class="modal-title">{{rules.title}}</text>
       <view class="close-btn" bindtap="close">✕</view>
     </view>
 
-    <scroll-view class="modal-body" scroll-y>
+    <scroll-view class="modal-body" scroll-y="true">
       <view class="section" wx:for="{{rules.sections}}" wx:key="title">
         <view class="section-title">{{item.title}}</view>
 

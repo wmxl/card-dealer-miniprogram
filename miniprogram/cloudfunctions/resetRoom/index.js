@@ -12,6 +12,11 @@ function createEmptyVoteHistory() {
   return Array.from({ length: 5 }, () => [])
 }
 
+function generateGameId(roomId) {
+  const randomPart = Math.random().toString(36).slice(2, 8)
+  return `${roomId}-${Date.now()}-${randomPart}`
+}
+
 exports.main = async (event, context) => {
   const { room_id } = event
 
@@ -65,6 +70,8 @@ exports.main = async (event, context) => {
     // 获取任务配置
     const missionConfig = getMissionConfig(playerCount)
 
+    const newGameId = generateGameId(room_id)
+
     // 构建全新的游戏状态对象（确保没有任何旧数据）
     const newGameState = {
       current_mission: 0,
@@ -75,6 +82,7 @@ exports.main = async (event, context) => {
       consecutive_rejects: 0,
       good_wins: 0,
       evil_wins: 0,
+      game_id: newGameId,
       votes: {},  // 空对象，没有任何投票记录
       votes_round: -1,
       nominated_players: [],

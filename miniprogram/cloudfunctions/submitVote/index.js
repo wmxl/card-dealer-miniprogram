@@ -8,6 +8,8 @@ cloud.init({
 const db = cloud.database()
 const _ = db.command
 
+const MAX_CONSECUTIVE_REJECTS = 3 // 连续否决达到 3 次则坏人胜利
+
 function createEmptyVoteHistory() {
   return Array.from({ length: 5 }, () => [])
 }
@@ -229,13 +231,13 @@ async function processVoteResult(room_id, room, votes, totalPlayers) {
     // 投票否决
     const consecutiveRejects = (gameState.consecutive_rejects || 0) + 1
 
-    if (consecutiveRejects >= 5) {
-      // 连续5次否决，坏人直接获胜
+    if (consecutiveRejects >= MAX_CONSECUTIVE_REJECTS) {
+      // 连续3次否决，坏人直接获胜
       await db.collection('rooms').doc(room_id).update({
         data: {
           status: 'finished',
           'game_state.winner': 'evil',
-          'game_state.win_reason': '连续5次否决',
+          'game_state.win_reason': `连续${MAX_CONSECUTIVE_REJECTS}次否决`,
           'game_state.vote_history': voteHistory,
           updated_at: db.serverDate()
         }

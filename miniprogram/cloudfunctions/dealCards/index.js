@@ -8,6 +8,11 @@ cloud.init({
 
 const db = cloud.database()
 
+function generateGameId(roomId) {
+  const randomPart = Math.random().toString(36).slice(2, 8)
+  return `${roomId}-${Date.now()}-${randomPart}`
+}
+
 function createEmptyVoteHistory() {
   return Array.from({ length: 5 }, () => [])
 }
@@ -82,6 +87,8 @@ exports.main = async (event, context) => {
     // 获取任务配置
     const missionConfig = getMissionConfig(players.length)
 
+    const newGameId = generateGameId(room_id)
+
     // 更新房间状态和任务配置
     await db.collection('rooms').doc(room_id).update({
       data: {
@@ -95,6 +102,7 @@ exports.main = async (event, context) => {
           consecutive_rejects: 0,
           good_wins: 0,
           evil_wins: 0,
+          game_id: newGameId,
           votes: {},
           votes_round: -1,
           nominated_players: [],
@@ -109,7 +117,8 @@ exports.main = async (event, context) => {
     return {
       room_id: room_id,
       success: true,
-      message: '角色分配成功，请查看身份'
+      message: '角色分配成功，请查看身份',
+      game_id: newGameId
     }
   } catch (error) {
     return {

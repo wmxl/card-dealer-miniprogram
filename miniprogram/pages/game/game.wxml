@@ -1,24 +1,15 @@
 <!--pages/game/game.wxml-->
 <view class="container">
-  <!-- 规则按钮 -->
-  <view class="rules-btn" bindtap="showRules">
-    <text>📖 规则</text>
-  </view>
-
-  <!-- 身份按钮 -->
-  <view class="role-btn" bindtap="showRole">
-    <text>🎭 身份</text>
-  </view>
-
-  <!-- 重置按钮 -->
-  <view class="reset-btn" bindtap="resetGame">
-    <text>🔄 重开</text>
-  </view>
-
-  <!-- 房间号 -->
-  <view class="room-header">
-    <text class="room-id-label">房间号：</text>
-    <text class="room-id-value">{{roomId}}</text>
+  <view class="top-row">
+    <view class="action-btn" bindtap="showRole">
+      <text>🎭 身份</text>
+    </view>
+    <view class="action-btn" bindtap="showRules">
+      <text>📖 规则</text>
+    </view>
+    <view class="action-btn danger" bindtap="resetGame">
+      <text>🔄 重开</text>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="loading">
@@ -66,7 +57,7 @@
       </view>
 
       <view wx:if="{{consecutiveRejects > 0}}" class="warning-banner">
-        ⚠️ 已连续否决{{consecutiveRejects}}次，再否决{{5 - consecutiveRejects}}次坏人直接获胜
+        ⚠️ 已连续否决{{consecutiveRejects}}次，再否决{{rejectsUntilLoss}}次坏人直接获胜
       </view>
     </view>
     <!-- 复盘面板 -->

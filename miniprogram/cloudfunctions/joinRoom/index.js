@@ -15,6 +15,11 @@ function createEmptyVoteHistory() {
   return Array.from({ length: 5 }, () => [])
 }
 
+function generateGameId(roomId) {
+  const randomPart = Math.random().toString(36).slice(2, 8)
+  return `${roomId}-${Date.now()}-${randomPart}`
+}
+
 // 自动发牌函数
 async function autoDealCards(room_id) {
   const playersResult = await db.collection('players')
@@ -50,6 +55,8 @@ async function autoDealCards(room_id) {
   // 获取任务配置
   const missionConfig = getMissionConfig(playerCount)
 
+  const newGameId = generateGameId(room_id)
+
   // 更新房间状态
   await db.collection('rooms').doc(room_id).update({
     data: {
@@ -63,6 +70,7 @@ async function autoDealCards(room_id) {
         consecutive_rejects: 0,
         good_wins: 0,
         evil_wins: 0,
+        game_id: newGameId,
         votes: {},
         votes_round: -1,
         nominated_players: [],
