@@ -8,6 +8,10 @@ cloud.init({
 const db = cloud.database()
 const { getRolesForPlayerCount, getMissionConfig } = require('./avalon-config')
 
+function createEmptyVoteHistory() {
+  return Array.from({ length: 5 }, () => [])
+}
+
 exports.main = async (event, context) => {
   const { room_id } = event
 
@@ -48,6 +52,7 @@ exports.main = async (event, context) => {
       return db.collection('players').doc(player._id).update({
         data: {
           role: shuffledRoles[index],
+          vote_history: createEmptyVoteHistory(),
           updated_at: db.serverDate()
         }
       })
@@ -71,6 +76,7 @@ exports.main = async (event, context) => {
       good_wins: 0,
       evil_wins: 0,
       votes: {},  // 空对象，没有任何投票记录
+      votes_round: -1,
       nominated_players: [],
       mission_submissions: {},
       vote_count: 0

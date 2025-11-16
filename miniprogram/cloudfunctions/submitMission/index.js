@@ -6,6 +6,7 @@ cloud.init({
 })
 
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event, context) => {
   const { room_id, player_number, success } = event
@@ -118,6 +119,10 @@ async function processMissionResult(room_id, room, missionSubmissions) {
         'game_state.mission_results': missionResults,
         'game_state.good_wins': goodWins,
         'game_state.evil_wins': evilWins,
+        'game_state.votes': _.set({}),
+        'game_state.votes_round': -1,
+        'game_state.mission_submissions': _.set({}),
+        'game_state.nominated_players': [],
         updated_at: db.serverDate()
       }
     })
@@ -131,6 +136,10 @@ async function processMissionResult(room_id, room, missionSubmissions) {
         'game_state.mission_results': missionResults,
         'game_state.good_wins': goodWins,
         'game_state.evil_wins': evilWins,
+        'game_state.votes': _.set({}),
+        'game_state.votes_round': -1,
+        'game_state.mission_submissions': _.set({}),
+        'game_state.nominated_players': [],
         updated_at: db.serverDate()
       }
     })
@@ -156,10 +165,11 @@ async function processMissionResult(room_id, room, missionSubmissions) {
         'game_state.mission_results': missionResults,
         'game_state.good_wins': goodWins,
         'game_state.evil_wins': evilWins,
-        'game_state.votes': {}, // 清空投票记录
-        'game_state.mission_submissions': {}, // 清空任务提交记录
+        'game_state.votes': _.set({}), // 清空投票记录
+        'game_state.mission_submissions': _.set({}), // 清空任务提交记录
         'game_state.nominated_players': [], // 清空提名玩家
         'game_state.vote_count': 0,
+        'game_state.votes_round': -1,
         updated_at: db.serverDate()
       }
     })

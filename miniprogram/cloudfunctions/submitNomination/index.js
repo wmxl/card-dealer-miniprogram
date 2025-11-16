@@ -6,6 +6,7 @@ cloud.init({
 })
 
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event, context) => {
   const { room_id, nominated_players } = event
@@ -47,8 +48,10 @@ exports.main = async (event, context) => {
       data: {
         status: 'voting',
         'game_state.nominated_players': nominated_players,
-        'game_state.votes': {}, // 清空投票记录
+        'game_state.votes': _.set({}), // 清空投票记录
         'game_state.vote_count': 0,
+        'game_state.votes_round': gameState.current_round || 0,
+        'game_state.mission_submissions': _.set({}),
         updated_at: db.serverDate()
       }
     })

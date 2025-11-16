@@ -32,7 +32,10 @@
         <view
           class="mission-item {{missionResults[index] ? (missionResults[index].success ? 'mission-success' : 'mission-failed') : (index <= currentMission ? 'active' : '')}}"
           wx:for="{{missionConfig}}"
-          wx:key="*this"
+          wx:key="index"
+          data-mission="{{index}}"
+          bindtap="showMissionVotes"
+          hover-class="mission-item-hover"
         >
           <view class="mission-number">任务{{index + 1}}</view>
           <view class="mission-players">{{item.players}}人</view>
@@ -79,7 +82,7 @@
             class="player-card {{selectedPlayersMap[item.player_number] ? 'selected' : ''}}"
             wx:for="{{allPlayers}}"
             wx:for-item="item"
-            wx:key="*this"
+            wx:key="player_number"
             data-player="{{item.player_number}}"
             bindtap="togglePlayerSelection"
           >
@@ -129,6 +132,7 @@
           class="btn btn-approve {{myVoteChoice === true ? 'vote-selected' : ''}}"
           data-approve="true"
           bindtap="vote"
+          disabled="{{myVoteChoice !== null}}"
         >
           赞成 👍
         </button>
@@ -136,6 +140,7 @@
           class="btn btn-reject {{myVoteChoice === false ? 'vote-selected' : ''}}"
           data-approve="false"
           bindtap="vote"
+          disabled="{{myVoteChoice !== null}}"
         >
           反对 👎
         </button>
@@ -170,7 +175,7 @@
         <view class="role-modal-message">{{role.message}}</view>
         <view wx:if="{{role.seePlayers && role.seePlayers.length > 0}}" class="role-modal-players">
           <view class="role-modal-subtitle">你知道的信息：</view>
-          <view wx:for="{{role.seePlayers}}" wx:key="*this" class="role-modal-player">
+          <view wx:for="{{role.seePlayers}}" wx:key="number" class="role-modal-player">
             <text class="player-num">{{item.number}}号</text>
             <text class="player-nickname">{{item.nickname}}</text>
             <text class="player-role">- {{item.roleName}}</text>
@@ -182,6 +187,39 @@
       </view>
       <view class="role-modal-footer">
         <button class="btn-close" bindtap="hideRole">关闭</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 任务投票记录弹窗 -->
+  <view wx:if="{{voteHistoryModalVisible}}" class="modal-overlay" bindtap="closeVoteHistoryModal">
+    <view class="vote-modal" catchtap="stopPropagation">
+      <view class="vote-modal-header">
+        <text class="vote-modal-title">任务{{voteHistoryMission + 1}}投票记录</text>
+      </view>
+      <view class="vote-modal-content">
+        <block wx:if="{{!voteHistoryEmpty}}">
+          <block wx:for="{{voteHistoryRounds}}" wx:key="round">
+            <view class="vote-round">
+              <view class="vote-round-header">第{{item.round + 1}}轮</view>
+              <view class="vote-round-list">
+                <view class="vote-round-player" wx:for="{{item.votes}}" wx:for-item="vote" wx:key="player_number">
+                  <text class="vote-player-number">{{vote.player_number}}号</text>
+                  <text class="vote-player-name">{{vote.nickname}}</text>
+                  <text class="vote-player-result {{vote.approve ? 'approve' : 'reject'}}">
+                    {{vote.approve ? '赞成' : '反对'}}
+                  </text>
+                </view>
+              </view>
+            </view>
+          </block>
+        </block>
+        <view wx:else class="vote-round-empty">
+          暂无投票记录
+        </view>
+      </view>
+      <view class="vote-modal-footer">
+        <button class="btn-close" bindtap="closeVoteHistoryModal">关闭</button>
       </view>
     </view>
   </view>

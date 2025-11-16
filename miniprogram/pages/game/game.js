@@ -1,4 +1,15 @@
 // pages/game/game.js
+
+function normalizeVoteHistory(history) {
+  if (!Array.isArray(history)) {
+    return Array.from({ length: 5 }, () => [])
+  }
+  return Array.from({ length: 5 }, (_, index) => {
+    const missionHistory = history[index]
+    return Array.isArray(missionHistory) ? missionHistory : []
+  })
+}
+
 Page({
   data: {
     roomId: '',
@@ -28,12 +39,17 @@ Page({
     votePhase: false,
     missionPhase: false,
     myVoteChoice: null, // 我的投票选择：true=赞成，false=反对，null=未投票
-    lastVotingRound: -1, // 记录上一次投票的轮次，用于判断是否是新一轮投票
+    lastVotingRound: -1, // 记录上一次投票的轮次（仅用于调试，可逐步废弃）
     lastGameStatus: null, // 记录上一次的游戏状态，用于判断是否重开
+    lastVoteKey: '',
 
     showRulesModal: false,
     showRoleModal: false, // 显示身份信息弹窗
-    loading: true
+    loading: true,
+    voteHistoryModalVisible: false,
+    voteHistoryMission: 0,
+    voteHistoryRounds: [],
+    voteHistoryEmpty: true
   },
 
   onLoad(options) {
@@ -53,7 +69,7 @@ Page({
 
     this.hasMissionJumped = false // 防止重复跳转到任务页面
     this.hasResetJumped = false // 防止重复跳转到首页
-    this.voteSnapshot = '' // 记录上一次的投票数据快照，避免复用旧投票
+    this.voteSnapshot = '' // 兼容旧逻辑的字段，后续可移除
 
     console.log('游戏页面加载，重置投票状态')
     this.setData({
@@ -61,7 +77,8 @@ Page({
       playerNumber: playerNumber,
       myVoteChoice: null, // 重置投票选择
       lastVotingRound: -1, // 重置投票轮次
-      lastGameStatus: null // 重置游戏状态
+      lastGameStatus: null, // 重置游戏状态
+      lastVoteKey: ''
     })
 
     this.loadGameState()
@@ -103,7 +120,8 @@ Page({
           const pn = parseInt(p.player_number)
           return {
             ...p,
-            player_number: isNaN(pn) ? p.player_number : pn
+            player_number: isNaN(pn) ? p.player_number : pn,
+            vote_history: normalizeVoteHistory(p.vote_history)
           }
         })
 
@@ -217,76 +235,52 @@ Page({
         }
       })
 
-      // 检查自己是否已投票（确保键类型一致）
+      // 检查自己是否已投票：优先使用玩家文档中的 vote_history
       const votes = this.data.gameState.votes || {}
       const playerNum = parseInt(this.data.playerNumber)
-      const myVote = votes[playerNum]
       const currentRound = this.data.gameState.current_round
-      const currentMission = this.data.gameState.current_mission
-      const voteHistory = this.data.gameState.vote_history || []
+      const missionIndex = this.data.gameState.current_mission || 0
+      const roundKey = `${missionIndex}-${currentRound}`
+      let previousVoteChoice = this.data.myVoteChoice
+      if (roundKey !== this.data.lastVoteKey) {
+        previousVoteChoice = null
+      }
+      const playerInfo = this.data.allPlayers.find(p => p.player_number === playerNum) || {}
+      const missionHistory = (playerInfo.vote_history && playerInfo.vote_history[missionIndex]) || []
+      const myVoteRecord = missionHistory.find(record => record.round === currentRound)
 
-      // 判断是否是新一轮投票（通过多个条件综合判断）
-      // 1. round 变化
-      const isRoundChanged = currentRound !== this.data.lastVotingRound
-      // 2. 游戏刚重开（mission=0, round=0, lastVotingRound=-1）
-      const isGameReset = currentMission === 0 && currentRound === 0 && this.data.lastVotingRound === -1
-      // 3. 游戏重开的另一个标志：没有投票历史记录（vote_history为空）
-      const hasNoHistory = voteHistory.length === 0
-      // 4. votes为空对象
-      const votesIsEmpty = Object.keys(votes).length === 0
-
-      const normalizedVotes = Object.keys(votes)
-        .sort((a, b) => Number(a) - Number(b))
-        .reduce((acc, key) => {
-          acc[key] = votes[key]
-          return acc
-        }, {})
-      const votesSnapshot = JSON.stringify(normalizedVotes)
-      const votesChanged = votesSnapshot !== (this.voteSnapshot || '')
-
-      if (votesChanged) {
-        this.voteSnapshot = votesSnapshot
+      let myVoteChoice = null
+      if (myVoteRecord && typeof myVoteRecord.approve === 'boolean') {
+        myVoteChoice = myVoteRecord.approve
+      } else {
+        myVoteChoice = previousVoteChoice
       }
 
-      // 如果游戏刚重开（没有历史记录），强制重置投票选择
-      const isNewVotingRound = isRoundChanged || isGameReset || hasNoHistory
-      const shouldUseServerVote = votesChanged && myVote !== undefined
-      const myVoteChoice = (isNewVotingRound || votesIsEmpty)
-        ? null
-        : (shouldUseServerVote ? myVote : this.data.myVoteChoice)
-
-      console.log('检查投票状态:', {
+      console.log('检查投票状态（玩家历史版）:', {
         playerNum,
         votesKeys: Object.keys(votes),
         votesValues: Object.values(votes),
         votesCount: Object.keys(votes).length,
-        voteHistoryLength: voteHistory.length,
-        myVote,
+        myVoteRecord,
         myVoteChoice,
-        isRoundChanged,
-        isGameReset,
-        hasNoHistory,
-        votesIsEmpty,
-        isNewVotingRound,
-        currentRound: currentRound,
-        lastVotingRound: this.data.lastVotingRound,
-        currentMission: currentMission
+        currentRound,
+        missionIndex
       })
 
       this.setData({
         votePhase: true,
         missionPhase: false,
         nominatedPlayersInfo: nominatedPlayersInfo,
-        myVoteChoice: myVoteChoice, // 新一轮投票时重置，否则保持状态
-        lastVotingRound: currentRound // 更新最后一次投票的轮次
+        myVoteChoice: myVoteChoice, // 新一轮投票时为 null，否则根据服务端/本地状态决定
+        lastVotingRound: currentRound, // 保持字段更新，便于后续调试或扩展
+        lastVoteKey: roundKey
       })
 
       console.log('投票阶段设置完成:', {
         nominatedPlayers: nominatedPlayersInfo,
         myVoteChoice: this.data.myVoteChoice,
         currentRound: currentRound,
-        lastVotingRound: this.data.lastVotingRound,
-        isNewVotingRound: isNewVotingRound
+        lastVotingRound: this.data.lastVotingRound
       })
     } else if (status === 'mission') {
       this.setData({ votePhase: false, missionPhase: true })
@@ -434,6 +428,14 @@ Page({
 
   // 投票
   async vote(e) {
+    if (this.data.myVoteChoice !== null) {
+      wx.showToast({
+        title: '本轮已投票',
+        icon: 'none'
+      })
+      return
+    }
+
     const approve = e.currentTarget.dataset.approve === 'true'
 
     // 记录投票选择，显示选中效果
@@ -468,6 +470,59 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  showMissionVotes(e) {
+    const missionIndex = Number(e.currentTarget.dataset.mission)
+
+    if (isNaN(missionIndex) || missionIndex < 0) {
+      return
+    }
+
+    const roundsMap = {}
+    const players = this.data.allPlayers || []
+
+    players.forEach(player => {
+      const missionHistory = (player.vote_history && player.vote_history[missionIndex]) || []
+      missionHistory.forEach(record => {
+        const roundKey = typeof record.round === 'number' ? record.round : 0
+        if (!roundsMap[roundKey]) {
+          roundsMap[roundKey] = []
+        }
+        roundsMap[roundKey].push({
+          player_number: player.player_number,
+          nickname: player.nickname || `玩家${player.player_number}`,
+          approve: record.approve
+        })
+      })
+    })
+
+    const rounds = Object.keys(roundsMap)
+      .map(key => Number(key))
+      .sort((a, b) => a - b)
+      .map(roundNumber => {
+        const mapKey = roundNumber.toString()
+        const votesForRound = roundsMap[mapKey] || []
+        return {
+          round: roundNumber,
+          votes: votesForRound.sort((a, b) => a.player_number - b.player_number)
+        }
+      })
+
+    this.setData({
+      voteHistoryModalVisible: true,
+      voteHistoryMission: missionIndex,
+      voteHistoryRounds: rounds,
+      voteHistoryEmpty: rounds.length === 0
+    })
+  },
+
+  closeVoteHistoryModal() {
+    this.setData({
+      voteHistoryModalVisible: false,
+      voteHistoryRounds: [],
+      voteHistoryEmpty: true
+    })
   },
 
   // 显示规则

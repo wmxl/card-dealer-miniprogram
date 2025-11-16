@@ -8,6 +8,10 @@ cloud.init({
 
 const db = cloud.database()
 
+function createEmptyVoteHistory() {
+  return Array.from({ length: 5 }, () => [])
+}
+
 exports.main = async (event, context) => {
   const { room_id } = event
 
@@ -66,7 +70,9 @@ exports.main = async (event, context) => {
     const updatePromises = playersWithRoles.map((player) => {
       return db.collection('players').doc(player._id).update({
         data: {
-          role: player.role
+          role: player.role,
+          vote_history: createEmptyVoteHistory(),
+          updated_at: db.serverDate()
         }
       })
     })
@@ -81,14 +87,18 @@ exports.main = async (event, context) => {
       data: {
         status: 'role_reveal',  // 角色查看阶段
         game_state: {
-          current_mission: 0,  // 当前任务索引（0-4）
-          current_round: 0,    // 当前轮次（从0开始）
-          current_leader: 0,   // 当前队长（玩家编号-1）
-          mission_results: [], // 任务结果
-          vote_history: [],    // 投票历史
-          consecutive_rejects: 0, // 连续否决次数
-          good_wins: 0,        // 好人胜利次数
-          evil_wins: 0,         // 坏人胜利次数
+          current_mission: 0,
+          current_round: 0,
+          current_leader: 0,
+          mission_results: [],
+          vote_history: [],
+          consecutive_rejects: 0,
+          good_wins: 0,
+          evil_wins: 0,
+          votes: {},
+          votes_round: -1,
+          nominated_players: [],
+          mission_submissions: {},
           vote_count: 0
         },
         mission_config: missionConfig,

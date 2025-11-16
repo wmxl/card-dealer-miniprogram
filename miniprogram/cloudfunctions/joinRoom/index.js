@@ -11,6 +11,10 @@ const _ = db.command
 // 导入游戏规则配置
 const { getRolesForPlayerCount, getMissionConfig } = require('./avalon-config')
 
+function createEmptyVoteHistory() {
+  return Array.from({ length: 5 }, () => [])
+}
+
 // 自动发牌函数
 async function autoDealCards(room_id) {
   const playersResult = await db.collection('players')
@@ -35,6 +39,7 @@ async function autoDealCards(room_id) {
     return db.collection('players').doc(player._id).update({
       data: {
         role: shuffledRoles[index],
+        vote_history: createEmptyVoteHistory(),
         updated_at: db.serverDate()
       }
     })
@@ -57,7 +62,12 @@ async function autoDealCards(room_id) {
         vote_history: [],
         consecutive_rejects: 0,
         good_wins: 0,
-        evil_wins: 0
+        evil_wins: 0,
+        votes: {},
+        votes_round: -1,
+        nominated_players: [],
+        mission_submissions: {},
+        vote_count: 0
       },
       mission_config: missionConfig,
       updated_at: db.serverDate()
@@ -112,7 +122,9 @@ exports.main = async (event, context) => {
         player_number: player_number,
         nickname: nickname || '',
         letter: '',
-        joined_at: db.serverDate()
+        vote_history: createEmptyVoteHistory(),
+        joined_at: db.serverDate(),
+        updated_at: db.serverDate()
       }
     })
 

@@ -100,6 +100,12 @@
   margin: 0 5rpx;
   position: relative;
   transition: all 0.3s;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.mission-item-hover {
+  transform: scale(1.03);
+  box-shadow: 0 6rpx 16rpx rgba(102, 126, 234, 0.35);
 }
 
 .mission-item.active {
@@ -422,6 +428,11 @@
   transition: all 0.3s;
 }
 
+.btn-approve[disabled] {
+  background: #a5d6a7;
+  color: #f5f5f5;
+}
+
 .btn-approve.vote-selected {
   background: #2e7d32;
   box-shadow: 0 0 0 4rpx rgba(76, 175, 80, 0.5);
@@ -434,6 +445,11 @@
   color: white;
   font-weight: bold;
   transition: all 0.3s;
+}
+
+.btn-reject[disabled] {
+  background: #ef9a9a;
+  color: #f5f5f5;
 }
 
 .btn-reject.vote-selected {
@@ -567,4 +583,98 @@
   font-size: 32rpx;
   font-weight: bold;
   border: none;
+}
+
+/* 任务投票记录弹窗 */
+.vote-modal {
+  width: 650rpx;
+  max-height: 80vh;
+  background: white;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vote-modal-header {
+  padding: 30rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  text-align: center;
+  color: white;
+}
+
+.vote-modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+}
+
+.vote-modal-content {
+  flex: 1;
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.vote-round {
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #f0f0f0;
+}
+
+.vote-round-header {
+  padding: 20rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  background: #fafafa;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.vote-round-list {
+  padding: 10rpx 20rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.vote-round-player {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10rpx;
+  padding: 15rpx 20rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.vote-player-number {
+  font-weight: bold;
+  color: #667eea;
+  width: 100rpx;
+}
+
+.vote-player-name {
+  flex: 1;
+  color: #333;
+}
+
+.vote-player-result {
+  font-weight: bold;
+}
+
+.vote-player-result.approve {
+  color: #4caf50;
+}
+
+.vote-player-result.reject {
+  color: #f44336;
+}
+
+.vote-round-empty {
+  text-align: center;
+  color: #666;
+  padding: 60rpx 20rpx;
+  font-size: 28rpx;
+}
+
+.vote-modal-footer {
+  padding: 20rpx 30rpx 30rpx;
 }

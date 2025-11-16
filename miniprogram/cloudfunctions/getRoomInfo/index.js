@@ -7,6 +7,15 @@ cloud.init({
 
 const db = cloud.database()
 
+function normalizeVoteHistory(rawHistory) {
+  const length = 5
+  const history = Array.isArray(rawHistory) ? rawHistory : []
+  return Array.from({ length }, (_, index) => {
+    const missionHistory = history[index]
+    return Array.isArray(missionHistory) ? missionHistory : []
+  })
+}
+
 exports.main = async (event, context) => {
   const { room_id } = event
 
@@ -33,7 +42,8 @@ exports.main = async (event, context) => {
     const players = playersResult.data.map(p => ({
       player_number: p.player_number,
       nickname: p.nickname || `玩家${p.player_number}`,
-      letter: p.letter || ''
+      letter: p.letter || '',
+      vote_history: normalizeVoteHistory(p.vote_history)
     }))
 
     return {
