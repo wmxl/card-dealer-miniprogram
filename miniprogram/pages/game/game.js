@@ -299,11 +299,15 @@ Page({
       // 检查自己是否是被提名玩家
       const nominatedPlayers = this.data.gameState.nominated_players || []
       const isParticipant = nominatedPlayers.includes(this.data.playerNumber)
+      
+      // 检查是否已提交任务
+      const missionSubmissions = this.data.gameState.mission_submissions || {}
+      const hasSubmitted = missionSubmissions[this.data.playerNumber] !== undefined
 
-      console.log('任务阶段，我的编号：', this.data.playerNumber, '被提名玩家：', nominatedPlayers, '是否参与：', isParticipant)
+      console.log('任务阶段，我的编号：', this.data.playerNumber, '被提名玩家：', nominatedPlayers, '是否参与：', isParticipant, '已提交：', hasSubmitted)
 
-      // 如果是被提名玩家，跳转到任务执行页面
-      if (isParticipant && !this.hasMissionJumped) {
+      // 如果是被提名玩家且未提交，跳转到任务执行页面
+      if (isParticipant && !hasSubmitted && !this.hasMissionJumped) {
         this.hasMissionJumped = true
         wx.redirectTo({
           url: `/pages/mission/mission?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}&is_participant=true`

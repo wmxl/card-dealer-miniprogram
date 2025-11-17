@@ -34,6 +34,18 @@ Page({
     })
 
     this.loadPlayerRole()
+    this.checkMissionStatus()
+    
+    // 设置定时检查任务状态
+    this.missionTimer = setInterval(() => {
+      this.checkMissionStatus()
+    }, 2000)
+  },
+
+  onUnload() {
+    if (this.missionTimer) {
+      clearInterval(this.missionTimer)
+    }
   },
 
   // 加载玩家角色
@@ -54,6 +66,51 @@ Page({
       }
     } catch (error) {
       console.error('加载角色失败', error)
+    }
+  },
+
+  // 检查任务状态
+  async checkMissionStatus() {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getRoomInfo',
+        data: {
+          room_id: this.data.roomId
+        }
+      })
+
+      if (res.result && res.result.room_id) {
+        const room = res.result
+        const gameState = room.game_state || {}
+        const missionSubmissions = gameState.mission_submissions || {}
+        const nominatedPlayers = gameState.nominated_players || []
+        const status = room.status
+
+        // 检查玩家是否已提交
+        const hasSubmitted = missionSubmissions[this.data.playerNumber] !== undefined
+        
+        // 如果玩家已提交，更新状态
+        if (hasSubmitted && !this.data.submitted) {
+          this.setData({ submitted: true })
+        }
+
+        // 如果房间状态不再是任务阶段，或者所有人都提交了，跳转回游戏页面
+        if (status !== 'mission') {
+          // 状态已改变，跳转回游戏页面
+          if (this.missionTimer) {
+            clearInterval(this.missionTimer)
+          }
+          wx.redirectTo({
+            url: `/pages/game/game?room_id=${this.data.roomId}&player_number=${this.data.playerNumber}`
+          })
+        } else if (hasSubmitted && Object.keys(missionSubmissions).length === nominatedPlayers.length) {
+          // 所有人都提交了，等待状态更新后跳转
+          // 这里不立即跳转，等待服务端处理完任务结果
+          console.log('所有人都已提交任务，等待处理结果')
+        }
+      }
+    } catch (error) {
+      console.error('检查任务状态失败', error)
     }
   },
 
