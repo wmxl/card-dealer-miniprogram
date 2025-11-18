@@ -233,56 +233,12 @@
   color: #f44336;
 }
 
-/* 状态区域 */
-.status-section {
+/* 用户模块 */
+.users-section {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
-}
-
-.current-leader {
-  text-align: center;
-  font-size: 32rpx;
-  color: #333;
-}
-
-.leader-label {
-  color: #666;
-}
-
-.leader-number {
-  font-weight: bold;
-  color: #667eea;
-  margin-left: 10rpx;
-}
-
-.leader-badge {
-  display: inline-block;
-  margin-left: 10rpx;
-  padding: 5rpx 15rpx;
-  background: #667eea;
-  color: white;
-  border-radius: 20rpx;
-  font-size: 24rpx;
-}
-
-.warning-banner {
-  margin-top: 20rpx;
-  padding: 20rpx;
-  background: #fff3cd;
-  border-left: 4rpx solid #ffc107;
-  border-radius: 8rpx;
-  color: #856404;
-  font-size: 26rpx;
-  text-align: center;
-}
-
-/* 提名阶段 */
-.nomination-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20rpx;
-  padding: 30rpx;
 }
 
 .section-title {
@@ -295,24 +251,41 @@
   border-bottom: 2rpx solid #e5e5e5;
 }
 
-.players-grid {
+.users-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15rpx;
   margin-bottom: 30rpx;
 }
 
-.player-card {
+.user-card-wrapper {
+  position: relative;
+}
+
+.user-card {
   background: #f5f5f5;
   border-radius: 12rpx;
-  padding: 30rpx 20rpx;
+  padding: 20rpx 15rpx;
   text-align: center;
   border: 3rpx solid transparent;
   transition: all 0.3s ease;
   position: relative;
+  min-height: 140rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.player-card.selected {
+.user-card.selectable {
+  cursor: pointer;
+}
+
+.user-card.selectable:active {
+  transform: scale(0.95);
+}
+
+.user-card.selected {
   background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
   border-color: #4caf50;
   border-width: 4rpx;
@@ -320,8 +293,80 @@
   transform: scale(1.05);
 }
 
-.player-card.selected::after {
-  content: '✓';
+.user-card.is-leader {
+  background: linear-gradient(135deg, #fff9e6 0%, #ffe0b2 100%);
+  border-color: #ff9800;
+  border-width: 3rpx;
+}
+
+.user-card.is-leader.selected {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-color: #4caf50;
+}
+
+.user-card.nominated {
+  border-color: #2196f3;
+  border-width: 3rpx;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.user-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-bottom: 10rpx;
+  width: 100%;
+  position: relative;
+}
+
+.user-number {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.leader-indicator {
+  position: absolute;
+  top: -20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22rpx;
+  color: #ff9800;
+  font-weight: bold;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  border: 2rpx solid #ff9800;
+  z-index: 10;
+  box-shadow: 0 2rpx 8rpx rgba(255, 152, 0, 0.3);
+}
+
+.nominated-indicator {
+  font-size: 24rpx;
+  color: #2196f3;
+  font-weight: bold;
+  position: absolute;
+  top: 5rpx;
+  left: 5rpx;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(33, 150, 243, 0.2);
+  border-radius: 50%;
+  border: 2rpx solid #2196f3;
+}
+
+.user-name {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 5rpx;
+}
+
+.selected-badge {
   position: absolute;
   top: 5rpx;
   right: 5rpx;
@@ -338,18 +383,9 @@
   box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.6);
 }
 
-.player-card-number {
-  display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #667eea;
-  margin-bottom: 10rpx;
-}
-
-.player-card-name {
-  display: block;
-  font-size: 24rpx;
-  color: #666;
+/* 提名阶段操作 */
+.nomination-actions {
+  margin-top: 20rpx;
 }
 
 .selected-count {
@@ -361,59 +397,14 @@
 
 .waiting-message {
   text-align: center;
-  padding: 80rpx 40rpx;
+  padding: 40rpx 20rpx;
   color: #999;
   font-size: 28rpx;
 }
 
-/* 投票阶段 */
-.vote-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20rpx;
-  padding: 30rpx;
-}
-
-.nominated-players {
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background: #f5f5f5;
-  border-radius: 12rpx;
-}
-
-.nominated-label {
-  display: block;
-  font-size: 28rpx;
-  color: #666;
-  margin-bottom: 15rpx;
-  text-align: center;
-}
-
-.nominated-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-}
-
-.nominated-player {
-  background: white;
-  padding: 15rpx 20rpx;
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
-  gap: 15rpx;
-}
-
-.nom-number {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #667eea;
-  min-width: 60rpx;
-}
-
-.nom-name {
-  font-size: 28rpx;
-  color: #333;
-  flex: 1;
+/* 投票阶段操作 */
+.vote-actions {
+  margin-top: 20rpx;
 }
 
 .vote-buttons {
@@ -428,18 +419,22 @@
   color: #999;
 }
 
-/* 任务执行阶段 */
-.mission-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20rpx;
-  padding: 30rpx;
-}
-
 .mission-message {
   text-align: center;
-  padding: 80rpx 40rpx;
+  padding: 40rpx 20rpx;
   color: #666;
   font-size: 28rpx;
+}
+
+.warning-banner {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #fff3cd;
+  border-left: 4rpx solid #ffc107;
+  border-radius: 8rpx;
+  color: #856404;
+  font-size: 26rpx;
+  text-align: center;
 }
 
 /* 按钮 */

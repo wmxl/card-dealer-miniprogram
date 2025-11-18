@@ -40,6 +40,7 @@ Page({
     isLeader: false,
     selectedPlayers: [], // 确保初始化为空数组
     selectedPlayersMap: {}, // 使用对象映射，更可靠
+    nominatedPlayersMap: {}, // 被提名玩家的映射对象，用于显示标识
     votePhase: false,
     missionPhase: false,
     myVoteChoice: null, // 我的投票选择：true=赞成，false=反对，null=未投票
@@ -154,6 +155,13 @@ Page({
           selectedPlayersMap[pn] = true
         })
 
+        // 构建被提名玩家的映射对象
+        const nominatedPlayers = gameState.nominated_players || []
+        const nominatedPlayersMap = {}
+        nominatedPlayers.forEach(pNum => {
+          nominatedPlayersMap[pNum] = true
+        })
+
         console.log('状态检查:', {
           oldStatus: this.data.gameState?.status,
           newStatus: data.status,
@@ -161,7 +169,8 @@ Page({
           shouldResetSelection,
           currentSelected: this.data.selectedPlayers,
           selectedPlayers: selectedPlayers,
-          selectedPlayersMap: selectedPlayersMap
+          selectedPlayersMap: selectedPlayersMap,
+          nominatedPlayersMap: nominatedPlayersMap
         })
 
         const consecutiveRejects = gameState.consecutive_rejects || 0
@@ -182,6 +191,7 @@ Page({
           isLeader: currentLeader === this.data.playerNumber - 1,
           selectedPlayers: selectedPlayers, // 避免定时刷新覆盖用户选择
           selectedPlayersMap: selectedPlayersMap, // 使用映射对象
+          nominatedPlayersMap: nominatedPlayersMap, // 被提名玩家映射
           loading: false,
           reviewMode: isFinished,
           gameResultTitle: isFinished ? winnerText : '',
@@ -244,10 +254,12 @@ Page({
       }
     } else if (status === 'nominating') {
       // 不在这里重置 selectedPlayers，因为在 loadGameState 中已经处理
+      // 清空被提名玩家映射
       this.setData({
         votePhase: false,
         missionPhase: false,
-        reviewMode: false
+        reviewMode: false,
+        nominatedPlayersMap: {}
       })
     } else if (status === 'voting') {
       // 处理提名玩家信息
@@ -258,6 +270,12 @@ Page({
           number: pNum,
           nickname: player ? (player.nickname || `玩家${pNum}`) : `玩家${pNum}`
         }
+      })
+
+      // 构建被提名玩家的映射对象
+      const nominatedPlayersMap = {}
+      nominatedPlayers.forEach(pNum => {
+        nominatedPlayersMap[pNum] = true
       })
 
       // 检查自己是否已投票：优先使用玩家文档中的 vote_history
@@ -296,6 +314,7 @@ Page({
         votePhase: true,
         missionPhase: false,
         nominatedPlayersInfo: nominatedPlayersInfo,
+        nominatedPlayersMap: nominatedPlayersMap, // 更新被提名玩家映射
         myVoteChoice: myVoteChoice, // 新一轮投票时为 null，否则根据服务端/本地状态决定
         lastVotingRound: currentRound, // 保持字段更新，便于后续调试或扩展
         lastVoteKey: roundKey
@@ -308,6 +327,7 @@ Page({
         lastVotingRound: this.data.lastVotingRound
       })
     } else if (status === 'mission') {
+      // 保持被提名玩家映射，以便在任务阶段也能看到被提名的玩家
       this.setData({ votePhase: false, missionPhase: true })
 
       // 检查自己是否是被提名玩家
@@ -347,6 +367,15 @@ Page({
   isPlayerSelected(playerNumber) {
     const selectedPlayers = this.data.selectedPlayers || []
     return selectedPlayers.indexOf(parseInt(playerNumber)) !== -1
+  },
+
+  // 处理用户卡片点击
+  handleUserCardTap(e) {
+    // 只有在提名阶段且是队长时才能点击选择
+    if (!this.data.isLeader || this.data.votePhase || this.data.missionPhase) {
+      return
+    }
+    this.togglePlayerSelection(e)
   },
 
   // 选择玩家（队长提名）
