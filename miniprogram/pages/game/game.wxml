@@ -30,6 +30,7 @@
         >
           <view class="mission-number">任务{{index + 1}}</view>
           <view class="mission-players">{{item.players}}人</view>
+          <view wx:if="{{item.failsRequired >= 2}}" class="mission-protection">保护轮</view>
           <view wx:if="{{missionResults[index]}}" class="mission-result-badge">
             {{missionResults[index].success ? '✓' : '✗'}}
           </view>
@@ -182,6 +183,51 @@
     </view>
   </view>
 
+  <!-- 任务结果弹窗 -->
+  <view wx:if="{{showMissionResultModal}}" class="modal-overlay" bindtap="closeMissionResultModal">
+    <view class="mission-result-modal" catchtap="stopPropagation">
+      <view class="mission-result-modal-content {{missionResultData.success ? 'success' : 'failed'}}">
+        <!-- 图标 -->
+        <view class="result-icon-wrapper">
+          <view class="result-icon {{missionResultData.success ? 'success' : 'failed'}}">
+            {{missionResultData.success ? '✓' : '✗'}}
+          </view>
+        </view>
+
+        <!-- 标题 -->
+        <view class="result-title">
+          {{missionResultData.success ? '任务成功' : '任务失败'}}
+        </view>
+
+        <!-- 任务编号 -->
+        <view class="result-mission-number">
+          任务 {{missionResultData.mission}}
+        </view>
+
+        <!-- 统计卡片 -->
+        <view class="result-cards">
+          <view class="result-card success-card">
+            <view class="card-icon">✓</view>
+            <view class="card-label">成功</view>
+            <view class="card-value">{{missionResultData.success_count}}</view>
+            <view class="card-unit">张</view>
+          </view>
+          <view class="result-card fail-card">
+            <view class="card-icon">✗</view>
+            <view class="card-label">失败</view>
+            <view class="card-value">{{missionResultData.fail_count}}</view>
+            <view class="card-unit">张</view>
+          </view>
+        </view>
+
+        <!-- 确定按钮 -->
+        <view class="result-btn-wrapper">
+          <button class="result-btn" bindtap="closeMissionResultModal">确定</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 任务投票记录弹窗 -->
   <view wx:if="{{voteHistoryModalVisible}}" class="modal-overlay" bindtap="closeVoteHistoryModal">
     <view class="vote-modal" catchtap="stopPropagation">
@@ -189,6 +235,35 @@
         <text class="vote-modal-title">任务{{voteHistoryMission + 1}}投票记录</text>
       </view>
       <view class="vote-modal-content">
+        <!-- 任务结果显示 -->
+        <view wx:if="{{voteHistoryMissionResult}}" class="mission-result-display">
+          <view class="mission-result-title {{voteHistoryMissionResult.success ? 'success' : 'failed'}}">
+            {{voteHistoryMissionResult.success ? '任务成功' : '任务失败'}}
+          </view>
+          <view class="mission-result-stats">
+            <view class="result-stat success">
+              <text class="stat-label">成功</text>
+              <text class="stat-value">{{voteHistoryMissionResult.success_count}}张</text>
+            </view>
+            <view class="result-stat failed">
+              <text class="stat-label">失败</text>
+              <text class="stat-value">{{voteHistoryMissionResult.fail_count}}张</text>
+            </view>
+          </view>
+          <!-- 参与玩家编号 -->
+          <view wx:if="{{voteHistoryMissionResult.participants && voteHistoryMissionResult.participants.length > 0}}" class="mission-participants">
+            <text class="participants-label">参与玩家：</text>
+            <block wx:for="{{voteHistoryMissionResult.participants}}" wx:key="*this" wx:for-index="idx">
+              <text class="participants-numbers">{{item}}号{{idx < voteHistoryMissionResult.participants.length - 1 ? '、' : ''}}</text>
+            </block>
+          </view>
+        </view>
+
+        <!-- 投票记录标题 -->
+        <view wx:if="{{voteHistoryMissionResult}}" class="vote-history-divider">
+          <text class="vote-history-title">投票记录</text>
+        </view>
+
         <block wx:if="{{!voteHistoryEmpty}}">
           <block wx:for="{{voteHistoryRounds}}" wx:key="round">
             <view class="vote-round">

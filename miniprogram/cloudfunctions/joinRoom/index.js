@@ -131,6 +131,8 @@ exports.main = async (event, context) => {
         nickname: nickname || '',
         letter: '',
         vote_history: createEmptyVoteHistory(),
+        online_status: 'online', // 在线状态: online/away
+        last_active: db.serverDate(), // 最后活跃时间
         joined_at: db.serverDate(),
         updated_at: db.serverDate()
       }

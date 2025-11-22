@@ -100,13 +100,11 @@ Page({
           currentGameId: gameId
         })
 
-        // 如果游戏已开始，自动跳转到角色查看页面
+        // 如果游戏已开始，直接跳转到游戏页面（无需检查角色）
         if (gameStarted && this.data.myPlayerNumber > 0 && !this.hasJumped) {
-          const skipRoleReveal = this.shouldSkipRoleReveal(gameId)
-          const targetUrl = skipRoleReveal ? this.buildGameUrl() : this.buildRoleRevealUrl(gameId)
           this.hasJumped = true
           wx.redirectTo({
-            url: targetUrl
+            url: this.buildGameUrl()
           })
         }
 

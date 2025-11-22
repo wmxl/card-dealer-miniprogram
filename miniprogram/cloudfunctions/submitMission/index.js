@@ -61,14 +61,17 @@ exports.main = async (event, context) => {
     })
 
     // 检查是否所有人都提交了
+    let missionResult = null
     if (Object.keys(missionSubmissions).length === nominatedPlayers.length) {
       // 所有人都提交了，处理任务结果
-      await processMissionResult(room_id, room, missionSubmissions)
+      missionResult = await processMissionResult(room_id, room, missionSubmissions)
     }
 
     return {
       success: true,
-      message: '提交成功'
+      message: '提交成功',
+      all_submitted: Object.keys(missionSubmissions).length === nominatedPlayers.length,
+      mission_result: missionResult
     }
   } catch (error) {
     return {
@@ -92,13 +95,14 @@ async function processMissionResult(room_id, room, missionSubmissions) {
 
   // 记录任务结果
   const missionResults = gameState.mission_results || []
-  missionResults.push({
+  const resultData = {
     mission: currentMission + 1,
     success: missionSuccess,
     fail_count: failCount,
     success_count: successCount,
     participants: gameState.nominated_players
-  })
+  }
+  missionResults.push(resultData)
 
   // 更新胜利次数
   let goodWins = gameState.good_wins || 0
@@ -174,4 +178,6 @@ async function processMissionResult(room_id, room, missionSubmissions) {
       }
     })
   }
+
+  return resultData
 }

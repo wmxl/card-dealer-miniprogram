@@ -55,9 +55,15 @@ Page({
     voteHistoryMission: 0,
     voteHistoryRounds: [],
     voteHistoryEmpty: true,
+    voteHistoryMissionResult: null, // 任务结果（成功/失败票数）
     reviewMode: false,
     gameResultTitle: '',
-    gameResultReason: ''
+    gameResultReason: '',
+
+    // 任务结果弹窗
+    showMissionResultModal: false,
+    missionResultData: null,
+    lastMissionResultCount: 0 // 记录上一次任务结果数量，用于检测新任务完成
   },
 
   onLoad(options) {
@@ -79,6 +85,10 @@ Page({
     this.hasResetJumped = false // 防止重复跳转到首页
     this.hasShownResult = false // 防止重复展示结果弹窗
     this.voteSnapshot = '' // 兼容旧逻辑的字段，后续可移除
+    this.isInitialLoad = true // 标记是否为初次加载
+
+    // 记录页面加载时的任务结果数量，用于判断是否是刚做完任务返回
+    this.initialMissionResultCount = 0
 
     console.log('游戏页面加载，重置投票状态')
     this.setData({
@@ -175,6 +185,7 @@ Page({
 
         const consecutiveRejects = gameState.consecutive_rejects || 0
         const rejectsUntilLoss = Math.max(0, MAX_CONSECUTIVE_REJECTS - consecutiveRejects)
+        const missionResults = gameState.mission_results || []
 
         this.setData({
           gameState: gameState,
@@ -183,7 +194,7 @@ Page({
           currentMission: gameState.current_mission || 0,
           currentRound: gameState.current_round || 0,
           currentLeader: currentLeader,
-          missionResults: gameState.mission_results || [],
+          missionResults: missionResults,
           consecutiveRejects: consecutiveRejects,
           rejectsUntilLoss: rejectsUntilLoss,
           goodWins: gameState.good_wins || 0,
@@ -197,6 +208,77 @@ Page({
           gameResultTitle: isFinished ? winnerText : '',
           gameResultReason: isFinished ? winnerReason : ''
         })
+
+        // 检测新的任务完成，显示结果弹窗（给所有人显示）
+        const gameId = gameState.game_id || ''
+        if (missionResults.length > 0) {
+          const latestResultIndex = missionResults.length - 1
+          const latestResult = missionResults[latestResultIndex]
+
+          // 使用 localStorage 记录每个玩家对每个任务的弹窗显示状态
+          const resultKey = `mission_result_shown_${this.data.roomId}_${gameId}_${this.data.playerNumber}_${latestResultIndex}`
+          const hasShownThisResult = wx.getStorageSync(resultKey)
+
+          console.log('[任务结果弹窗检查]', {
+            isInitialLoad: this.isInitialLoad,
+            hasShownThisResult,
+            currentCount: missionResults.length,
+            lastCount: this.data.lastMissionResultCount,
+            gameId: gameId,
+            playerNumber: this.data.playerNumber,
+            resultKey: resultKey
+          })
+
+          // 如果是初次加载
+          if (this.isInitialLoad) {
+            // 记录初始任务数量
+            this.initialMissionResultCount = missionResults.length
+
+            // 标记所有现有任务结果为已显示（除了最新的一个）
+            // 如果最新的任务是刚完成的，给用户一次看弹窗的机会
+            for (let i = 0; i < missionResults.length - 1; i++) {
+              const key = `mission_result_shown_${this.data.roomId}_${gameId}_${this.data.playerNumber}_${i}`
+              wx.setStorageSync(key, true)
+            }
+
+            this.setData({
+              lastMissionResultCount: missionResults.length
+            })
+            this.isInitialLoad = false
+
+            // 如果最新的结果还没显示过，立即显示（用户可能刚做完任务返回）
+            if (!hasShownThisResult) {
+              wx.setStorageSync(resultKey, true)
+              this.setData({
+                missionResultData: latestResult,
+                showMissionResultModal: true
+              })
+              console.log('[任务结果弹窗] 初次加载，显示最新结果', latestResult)
+            } else {
+              console.log('[任务结果弹窗] 初次加载，最新结果已显示过')
+            }
+          }
+          // 如果不是初次加载，且这个结果还没显示过，则显示弹窗
+          else if (!hasShownThisResult) {
+            wx.setStorageSync(resultKey, true)
+            this.setData({
+              lastMissionResultCount: missionResults.length,
+              missionResultData: latestResult,
+              showMissionResultModal: true
+            })
+            console.log('[任务结果弹窗] 显示弹窗', latestResult)
+          }
+          // 否则只更新计数
+          else {
+            this.setData({
+              lastMissionResultCount: missionResults.length
+            })
+            console.log('[任务结果弹窗] 该结果已显示过，不再弹窗')
+          }
+        } else if (this.isInitialLoad) {
+          // 如果是初次加载且没有任务结果，标记初次加载完成
+          this.isInitialLoad = false
+        }
 
         // 检查游戏状态
         this.checkGamePhase(data.status)
@@ -567,11 +649,16 @@ Page({
         }
       })
 
+    // 获取该任务的结果（成功/失败票数）
+    const missionResults = this.data.missionResults || []
+    const missionResult = missionResults[missionIndex] || null
+
     this.setData({
       voteHistoryModalVisible: true,
       voteHistoryMission: missionIndex,
       voteHistoryRounds: rounds,
-      voteHistoryEmpty: rounds.length === 0
+      voteHistoryEmpty: rounds.length === 0,
+      voteHistoryMissionResult: missionResult
     })
   },
 
@@ -579,7 +666,8 @@ Page({
     this.setData({
       voteHistoryModalVisible: false,
       voteHistoryRounds: [],
-      voteHistoryEmpty: true
+      voteHistoryEmpty: true,
+      voteHistoryMissionResult: null
     })
   },
 
@@ -721,22 +809,19 @@ Page({
 
     const winnerText = this.formatWinnerText(winner)
 
-    const contentLines = []
-    contentLines.push(winnerText)
-    if (winReason) {
-      contentLines.push(winReason)
-    }
-
+    // 只设置复盘模式数据，不弹窗（因为已经有复盘界面了）
     this.setData({
       reviewMode: true,
       gameResultTitle: winnerText,
       gameResultReason: winReason || ''
     })
+  },
 
-    wx.showModal({
-      title: '游戏结束',
-      content: contentLines.join('\n'),
-      showCancel: false
+  // 关闭任务结果弹窗
+  closeMissionResultModal() {
+    this.setData({
+      showMissionResultModal: false,
+      missionResultData: null
     })
   }
 })

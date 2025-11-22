@@ -176,6 +176,14 @@
   opacity: 0.8;
 }
 
+.mission-protection {
+  font-size: 18rpx;
+  opacity: 0.7;
+  margin-top: 2rpx;
+  color: #ff9800;
+  font-weight: bold;
+}
+
 .mission-result-badge {
   position: absolute;
   top: -10rpx;
@@ -723,4 +731,344 @@
 
 .vote-modal-footer {
   padding: 20rpx 30rpx 30rpx;
+}
+
+
+/* 任务结果显示 */
+.mission-result-display {
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
+  border-radius: 16rpx;
+  border: 2rpx solid #e0e0e0;
+}
+
+.mission-result-title {
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 15rpx;
+  padding: 10rpx;
+  border-radius: 12rpx;
+}
+
+.mission-result-title.success {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.mission-result-title.failed {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.mission-result-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 20rpx;
+}
+
+.result-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx;
+  background: white;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.result-stat.success {
+  border: 2rpx solid #4caf50;
+}
+
+.result-stat.failed {
+  border: 2rpx solid #f44336;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.result-stat.success .stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.result-stat.failed .stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #f44336;
+}
+
+.mission-participants {
+  margin-top: 15rpx;
+  padding: 12rpx 16rpx;
+  background: white;
+  border-radius: 12rpx;
+  text-align: center;
+  font-size: 24rpx;
+}
+
+.participants-label {
+  color: #999;
+  margin-right: 8rpx;
+}
+
+.participants-numbers {
+  color: #667eea;
+  font-weight: bold;
+}
+
+.vote-history-divider {
+  margin: 20rpx 0;
+  text-align: center;
+  position: relative;
+}
+
+.vote-history-divider::before,
+.vote-history-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 2rpx;
+  background: #e0e0e0;
+}
+
+.vote-history-divider::before {
+  left: 0;
+}
+
+.vote-history-divider::after {
+  right: 0;
+}
+
+.vote-history-title {
+  display: inline-block;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: #999;
+  background: white;
+}
+
+/* 任务结果弹窗 */
+.mission-result-modal {
+  width: 90%;
+  max-width: 600rpx;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50rpx) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mission-result-modal-content {
+  background: white;
+  border-radius: 32rpx;
+  padding: 60rpx 40rpx 40rpx;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mission-result-modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  opacity: 0.1;
+}
+
+.mission-result-modal-content.success::before {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+}
+
+.mission-result-modal-content.failed::before {
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+}
+
+.result-icon-wrapper {
+  margin-bottom: 30rpx;
+  animation: iconBounce 0.6s ease-out;
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.result-icon {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  font-weight: bold;
+  color: white;
+  margin: 0 auto;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.result-icon.success {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+}
+
+.result-icon.failed {
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+}
+
+.result-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  background: linear-gradient(135deg, #333 0%, #666 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.result-mission-number {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.result-cards {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+  animation: cardsFadeIn 0.4s ease-out 0.2s both;
+}
+
+@keyframes cardsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-card {
+  flex: 1;
+  background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
+  border-radius: 24rpx;
+  padding: 30rpx 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+}
+
+.result-card.success-card::before {
+  background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+}
+
+.result-card.fail-card::before {
+  background: linear-gradient(90deg, #f44336 0%, #ef5350 100%);
+}
+
+.card-icon {
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 15rpx;
+}
+
+.success-card .card-icon {
+  color: #4caf50;
+}
+
+.fail-card .card-icon {
+  color: #f44336;
+}
+
+.card-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.card-value {
+  font-size: 56rpx;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 5rpx;
+}
+
+.success-card .card-value {
+  color: #4caf50;
+}
+
+.fail-card .card-value {
+  color: #f44336;
+}
+
+.card-unit {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.result-btn-wrapper {
+  animation: btnFadeIn 0.4s ease-out 0.3s both;
+}
+
+@keyframes btnFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.result-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.4);
+  transition: all 0.3s;
+}
+
+.result-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
 }
