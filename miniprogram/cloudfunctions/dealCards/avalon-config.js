@@ -6,13 +6,15 @@ const ROLES = {
   MERLIN: { name: '梅林', side: 'good', code: 'merlin' },
   PERCIVAL: { name: '派西维尔', side: 'good', code: 'percival' },
   LOYAL_SERVANT: { name: '忠臣', side: 'good', code: 'loyal' },
+  LANCELOT_BLUE: { name: '兰斯洛特（蓝）', side: 'good', code: 'lancelot_blue' },
 
   // 坏人阵营
   MORGANA: { name: '莫甘娜', side: 'evil', code: 'morgana' },
   ASSASSIN: { name: '刺客', side: 'evil', code: 'assassin' },
   MORDRED: { name: '莫德雷德', side: 'evil', code: 'mordred' },
   OBERON: { name: '奥伯伦', side: 'evil', code: 'oberon' },
-  MINION: { name: '爪牙', side: 'evil', code: 'minion' }
+  MINION: { name: '爪牙', side: 'evil', code: 'minion' },
+  LANCELOT_RED: { name: '兰斯洛特（红）', side: 'evil', code: 'lancelot_red' }
 }
 
 // 各人数的角色配置
@@ -43,19 +45,19 @@ const PLAYER_CONFIGS = {
   },
   9: {
     good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT],
-    evil: [ROLES.MORGANA, ROLES.ASSASSIN, ROLES.MORDRED]
+    evil: [ROLES.MORDRED, ROLES.MORGANA, ROLES.ASSASSIN]
   },
   10: {
     good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT],
-    evil: [ROLES.MORGANA, ROLES.ASSASSIN, ROLES.MORDRED, ROLES.OBERON]
+    evil: [ROLES.MORDRED, ROLES.MORGANA, ROLES.OBERON, ROLES.ASSASSIN]
   },
   11: {
-    good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT],
-    evil: [ROLES.MORGANA, ROLES.ASSASSIN, ROLES.MORDRED, ROLES.OBERON]
+    good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LANCELOT_BLUE],
+    evil: [ROLES.MORDRED, ROLES.MORGANA, ROLES.ASSASSIN, ROLES.LANCELOT_RED]
   },
   12: {
-    good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT],
-    evil: [ROLES.MORGANA, ROLES.ASSASSIN, ROLES.MORDRED, ROLES.OBERON, ROLES.MINION]
+    good: [ROLES.MERLIN, ROLES.PERCIVAL, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LOYAL_SERVANT, ROLES.LANCELOT_BLUE],
+    evil: [ROLES.MORDRED, ROLES.MORGANA, ROLES.ASSASSIN, ROLES.OBERON, ROLES.LANCELOT_RED]
   }
 }
 
@@ -79,14 +81,14 @@ const MISSION_CONFIGS = {
     { players: 2, failsRequired: 1 },
     { players: 3, failsRequired: 1 },
     { players: 2, failsRequired: 1 },
-    { players: 3, failsRequired: 2 },
+    { players: 3, failsRequired: 1 },
     { players: 3, failsRequired: 1 }
   ],
   6: [
     { players: 2, failsRequired: 1 },
     { players: 3, failsRequired: 1 },
     { players: 4, failsRequired: 1 },
-    { players: 3, failsRequired: 2 },
+    { players: 3, failsRequired: 1 },
     { players: 4, failsRequired: 1 }
   ],
   7: [
@@ -120,14 +122,14 @@ const MISSION_CONFIGS = {
   11: [
     { players: 3, failsRequired: 1 },
     { players: 4, failsRequired: 1 },
-    { players: 4, failsRequired: 1 },
+    { players: 5, failsRequired: 1 },
     { players: 6, failsRequired: 2 },
     { players: 6, failsRequired: 1 }
   ],
   12: [
     { players: 3, failsRequired: 1 },
     { players: 4, failsRequired: 1 },
-    { players: 4, failsRequired: 1 },
+    { players: 5, failsRequired: 1 },
     { players: 6, failsRequired: 2 },
     { players: 6, failsRequired: 1 }
   ]

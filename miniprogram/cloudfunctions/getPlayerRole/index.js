@@ -49,25 +49,58 @@ function getPlayerVision(player, allPlayers) {
     case 'morgana':
     case 'mordred':
     case 'minion':
-      // 坏人互相认识（奥伯伦除外）
+      // 坏人互相认识（奥伯伦除外）；仅知红兰斯洛特
       vision.seePlayers = allPlayers
-        .filter(p => p.role.side === 'evil' && p.role.code !== 'oberon' && p.player_number !== player.player_number)
+        .filter(p => {
+          const isSelf = p.player_number === player.player_number
+          const isEvilPartner = p.role.side === 'evil' && p.role.code !== 'oberon' && !isSelf
+          const isRedLancelot = p.role.code === 'lancelot_red' && !isSelf
+          return isEvilPartner || isRedLancelot
+        })
         .map(p => ({
           number: p.player_number,
           playerNumber: p.player_number,
           nickname: p.nickname || `玩家${p.player_number}`,
           roleName: p.role.name
         }))
-      vision.message = '你的队友'
+      vision.message = '你的队友（含红兰斯洛特信息）'
       vision.tip = player.role.code === 'assassin'
         ? '如果好人完成三次任务，你需要刺杀梅林'
         : '配合队友让任务失败'
+      break
+
+    case 'lancelot_red':
+      // 红兰斯洛特：可看到蓝兰斯洛特；其他红队（除奥伯伦）知道你
+      vision.seePlayers = allPlayers
+        .filter(p => p.role.code === 'lancelot_blue')
+        .map(p => ({
+          number: p.player_number,
+          playerNumber: p.player_number,
+          nickname: p.nickname || `玩家${p.player_number}`,
+          roleName: p.role.name
+        }))
+      vision.message = '你是红兰斯洛特，你看到了蓝兰斯洛特'
+      vision.tip = '隐藏身份，配合坏人；若启用互换变体需留意阵营变化'
       break
 
     case 'oberon':
       // 奥伯伦不认识任何人
       vision.message = '你是孤独的坏人，不认识其他人'
       vision.tip = '隐藏身份，暗中破坏任务'
+      break
+
+    case 'lancelot_blue':
+      // 蓝兰斯洛特：好人阵营，能看到红兰斯洛特，坏人看不到你
+      vision.seePlayers = allPlayers
+        .filter(p => p.role.code === 'lancelot_red')
+        .map(p => ({
+          number: p.player_number,
+          playerNumber: p.player_number,
+          nickname: p.nickname || `玩家${p.player_number}`,
+          roleName: p.role.name
+        }))
+      vision.message = '你是蓝兰斯洛特，阵营为好人，你看到了红兰斯洛特'
+      vision.tip = '协助好人；坏人看不到你，若启用互换规则需警惕变阵营'
       break
 
     case 'loyal':
